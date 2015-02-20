@@ -1,0 +1,23 @@
+.PHONY: all clean
+
+PREFIX = ds1077l
+
+COMMON_OBJ = ${PREFIX}.o
+COMMON_SRC = ${PREFIX}.h ${PREFIX}.c
+
+DUMP_BIN = ${PREFIX}-dump
+DUMP_OBJ = ${DUMP_BIN}.o
+DUMP_SRC = ${DUMP_BIN}.c
+
+BINS=${DUMP_BIN}
+OBJS=${COMMON_OBJ} ${DUMP_OBJ}
+
+all: ${BINS}
+clean:
+	rm -f ${BINS} ${OBJS}
+
+${COMMON_OBJ} : ${COMMON_SRC}
+
+${DUMP_OBJ} : ${DUMP_SRC}
+${DUMP_BIN} : ${DUMP_OBJ} ${COMMON_OBJ}
+
