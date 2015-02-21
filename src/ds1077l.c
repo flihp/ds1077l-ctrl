@@ -39,9 +39,9 @@ int bus_get(int fd, ds1077l_bus_t* bus)
     if (ret == -1)
         return ret;
     /* wc bit is the 4th bit in the first byte */
-    bus->wc = 0x07 & ret;
+    bus->wc = WC_UNPACK(ret);
     /* address is 0x58 + low 3 bits in the first byte */
-    bus->address = 0x08 & ret | DS1077L_ADDR_DEFAULT;
+    bus->address = ADDRESS_UNPACK(ret);
     return 0;
 }
 
@@ -66,16 +66,16 @@ static int mux_from_int(ds1077l_mux_t* mux, int32_t word)
     /* See page 5 from the DS1077L data sheet for MUX WORD format.
      * First byte read is the least significant byte in the int32_t.
      */
-    mux->pdn1 = word & 0x40 ? true : false;
-    mux->pdn0 = word & 0x20 ? true : false;
-    mux->sel0 = word & 0x10 ? true : false;
-    mux->en0  = word & 0x08 ? true : false;
-    mux->m0   = decode_prescalar((word & 0x6)>>1);
+    mux->pdn1 = PDN1_UNPACK(word);
+    mux->pdn0 = PDN0_UNPACK(word);
+    mux->sel0 = SEL0_UNPACK(word);
+    mux->en0  = EN0_UNPACK(word);
+    mux->m0   = decode_prescalar(M0_UNPACK(word));
     /* m1 is wacky because the 1M bits span the byte boundary. 1M1 is the LSB
      * of the first byte and 1M0 is the MSB of the second byte.
      */
-    mux->m1   = decode_prescalar((word & 0x8000)>>7 | (word & 0x1)<<1);
-    mux->div1 = word & 0x4000 ? true : false;
+    mux->m1   = decode_prescalar(M1_UNPACK(word));
+    mux->div1 = DIV1_UNPACK(word);
     return 0;
 }
 
@@ -131,7 +131,7 @@ int div_get(int fd, ds1077l_div_t* div)
     ret = i2c_smbus_read_word_data(fd, COMMAND_DIV);
     if (ret == -1)
         return -1;
-    div->n = ((ret & 0xFF) << 2 | (ret & 0xc000) >> 14) + 2;
+    div->n = DIV_UNPACK(ret);
     return 0;
 }
 
