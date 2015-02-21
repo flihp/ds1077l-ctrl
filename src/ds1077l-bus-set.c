@@ -81,6 +81,7 @@ parse_opts (int key, char *arg, struct argp_state *state)
             if (number < 0x58 | number > 0x5f)
                 argp_usage (state);
             bus_args->new_addr = number;
+            bus_args->new_addr_set = true;
             break;
         case 'w':
             /* wc is either "true" or "false" */
@@ -92,6 +93,7 @@ parse_opts (int key, char *arg, struct argp_state *state)
                 bus_args->write_on_change = false;
             else
                 argp_usage (state);
+            bus_args->write_on_change_set = true;
             break;
         default:
             return ARGP_ERR_UNKNOWN;
@@ -117,13 +119,19 @@ main (int argc, char *argv[])
     bus_args_t bus_args = {
         .address = DS1077L_ADDR_DEFAULT,
         .new_addr = DS1077L_ADDR_DEFAULT,
+        .new_addr_set = false,
         .bus = "/dev/i2c-1",
-        .write_on_change = DS1077L_WC_DEFAULT
+        .write_on_change = DS1077L_WC_DEFAULT,
+        .write_on_change_set = false,
     };
     ds1077l_bus_t bus = {0};
 
     if (argp_parse (&argps, argc, argv, 0, NULL, &bus_args)) {
         perror ("argp_parse: \n");
+        exit (1);
+    }
+    if (! (bus_args.new_addr_set | bus_args.write_on_change_set)) {
+        fprintf(stderr, "Either a new address or a new value for the wc bit must be provided.\n");
         exit (1);
     }
     fd = handle_get (bus_args.bus, bus_args.address);
@@ -139,8 +147,10 @@ main (int argc, char *argv[])
     printf ("Current BUS register state:\n");
     bus_pretty (&bus);
     /* populate new structure, display to user, and make change */
-    bus.address = bus_args.new_addr;
-    bus.wc = (bus_args.write_on_change ? true : false);
+    if (bus_args.new_addr_set)
+        bus.address = bus_args.new_addr;
+    if (bus_args.write_on_change_set)
+        bus.wc = bus_args.write_on_change;
     printf ("Setting device 0x%x on bus %s to:\n",
             bus_args.address, bus_args.bus);
     bus_pretty (&bus);
