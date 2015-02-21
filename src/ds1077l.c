@@ -121,3 +121,24 @@ static uint8_t decode_prescalar(uint8_t m)
         return -1;
     }
 }
+
+/* Get DIV register from the timer and populate the div data structure with it.
+ */
+int div_get(int fd, ds1077l_div_t* div)
+{
+    uint32_t ret = 0;
+
+    ret = i2c_smbus_read_word_data(fd, COMMAND_DIV);
+    if (ret == -1)
+        return -1;
+    div->n = ((ret & 0xFF) << 2 | (ret & 0xc000) >> 14) + 2;
+    return 0;
+}
+
+/* Print DIV structure in human consumable form.
+ */
+void div_pretty(ds1077l_div_t* div)
+{
+    printf("DIV:\n");
+    printf("  N: %d\n", div->n);
+}

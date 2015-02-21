@@ -10,6 +10,7 @@
 int main(int argc, char* argv[])
 {
     ds1077l_bus_t bus = {0};
+    ds1077l_div_t div = {0};
     ds1077l_mux_t mux = {0};
     int fd = 0;
     char* dev_path = NULL;
@@ -42,5 +43,10 @@ int main(int argc, char* argv[])
         exit(1);
     }
     mux_pretty(&mux);
+    if (div_get(fd, &div) == -1) {
+        perror("div_get: ");
+        exit(1);
+    }
+    div_pretty(&div);
     exit(0);
 }
