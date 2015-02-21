@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-static uint8_t decode_prescalar(uint8_t m);
 static int mux_from_int(ds1077l_mux_t* mux, int32_t word);
 /* Convenience function to get a file descriptor for an i2c bus. Set the device
    address (second parameter) to 0 and the default address for the DS1077L will
@@ -70,11 +69,11 @@ static int mux_from_int(ds1077l_mux_t* mux, int32_t word)
     mux->pdn0 = PDN0_UNPACK(word);
     mux->sel0 = SEL0_UNPACK(word);
     mux->en0  = EN0_UNPACK(word);
-    mux->m0   = decode_prescalar(M0_UNPACK(word));
+    mux->m0   = M0_UNPACK(word);
     /* m1 is wacky because the 1M bits span the byte boundary. 1M1 is the LSB
      * of the first byte and 1M0 is the MSB of the second byte.
      */
-    mux->m1   = decode_prescalar(M1_UNPACK(word));
+    mux->m1   = M1_UNPACK(word);
     mux->div1 = DIV1_UNPACK(word);
     return 0;
 }
@@ -104,24 +103,6 @@ void mux_pretty(ds1077l_mux_t* mux)
     printf("  DIV1: %s\n", mux->div1 ? "true" : "false");
 }
 
-/* Decode value of the prescalar 'M'. see table 4 from DS1077L spec sheet.
- */
-static uint8_t decode_prescalar(uint8_t m)
-{
-    switch (m) {
-    case 0:
-        return 1;
-    case 1:
-        return 2;
-    case 2:
-        return 4;
-    case 4:
-        return 8;
-    default:
-        return -1;
-    }
-}
-
 /* Get DIV register from the timer and populate the div data structure with it.
  */
 int div_get(int fd, ds1077l_div_t* div)
@@ -133,6 +114,24 @@ int div_get(int fd, ds1077l_div_t* div)
         return -1;
     div->n = DIV_UNPACK(ret);
     return 0;
+}
+
+/* Map prescalar values to divisor.
+ */
+inline uint8_t decode_prescalar(uint8_t m)
+{
+    switch (m) {
+    case 0:
+        return 1;
+    case 1:
+        return 2;
+    case 2:
+        return 4;
+    case 3:
+        return 8;
+    default:
+        return -1;
+    }
 }
 
 /* Print DIV structure in human consumable form.

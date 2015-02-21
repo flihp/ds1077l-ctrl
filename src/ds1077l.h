@@ -73,8 +73,8 @@
 #define PDN0_UNPACK(mux) (mux & 0x20 ? true : false)
 #define SEL0_UNPACK(mux) (mux & 0x10 ? true : false)
 #define EN0_UNPACK(mux)  (mux & 0x08 ? true : false)
-#define M0_UNPACK(mux)   ((mux & 0x6) >> 1)
-#define M1_UNPACK(mux)   ((mux & 0x8000) >> 7 | (mux & 0x1) << 1)
+#define M0_UNPACK(mux)   decode_prescalar((mux & 0x6) >> 1)
+#define M1_UNPACK(mux)   decode_prescalar((mux & 0x8000) >> 7 | (mux & 0x1) << 1)
 #define DIV1_UNPACK(mux) (mux & 0x4000 ? true : false)
 
 typedef struct ds1077l_bus {
@@ -103,3 +103,4 @@ int mux_get(int fd, ds1077l_mux_t* mux);
 void mux_pretty(ds1077l_mux_t* mux);
 int div_get(int fd, ds1077l_div_t* div);
 void div_pretty(ds1077l_div_t* div);
+inline uint8_t decode_prescalar(uint8_t m);
