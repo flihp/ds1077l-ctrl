@@ -29,6 +29,7 @@
  */
 #define ADDRESS_UNPACK(bus) (0x07 & bus | DS1077L_ADDR_DEFAULT)
 #define WC_UNPACK(bus)      (bus & 0x07)
+#define BUS_PACK(bus) ((bus->address & 0x7) | (bus->wc & 0x1) >> 4)
 
 /* div register (un)?pack
  * Diagram taken from the spec sheet page 6.
@@ -99,6 +100,7 @@ typedef struct ds1077l_div {
 
 int handle_get(char* dev, uint8_t addr);
 int bus_get(int fd, ds1077l_bus_t* bus);
+int bus_set (int fd, ds1077l_bus_t *bus);
 void bus_pretty(ds1077l_bus_t* bus);
 int mux_get(int fd, ds1077l_mux_t* mux);
 void mux_pretty(ds1077l_mux_t* mux);

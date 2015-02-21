@@ -117,11 +117,34 @@ main (int argc, char *argv[])
         .bus = "/dev/i2c-1",
         .write_on_change = DS1077L_WC_DEFAULT
     };
+    ds1077l_bus_t bus = {0};
+
     if (argp_parse (&argps, argc, argv, 0, NULL, &bus_args)) {
         perror ("argp_parse: \n");
         exit (1);
     }
-    printf("parsed\n");
+    fd = handle_get (bus_args.bus, bus_args.address);
+    if (fd == -1) {
+        perror ("handle_get: ");
+        exit (1);
+    }
+    /* get current register state and display to user */
+    if (bus_get (fd, &bus)) {
+        perror ("bus_set: ");
+        exit (1);
+    }
+    printf ("Current BUS register state:\n");
+    bus_pretty (&bus);
+    /* populate new structure, display to user, and make change */
+    bus.address = bus_args.new_addr;
+    bus.wc = (bus_args.write_on_change ? true : false);
+    printf ("Setting device 0x%x on bus %s to:\n",
+            bus_args.address, bus_args.bus);
+    bus_pretty (&bus);
+    if (bus_set (fd, &bus)) {
+        perror ("bus_set: ");
+        exit (1);
+    }
     exit (0);
 }
 

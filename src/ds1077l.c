@@ -44,6 +44,22 @@ int bus_get(int fd, ds1077l_bus_t* bus)
     return 0;
 }
 
+/* Set the bus register on the device represented by fd with the values in the
+ * provided ds1077l_bus_t object.
+ */
+int
+bus_set (int fd, ds1077l_bus_t *bus)
+{
+    int ret = 0;
+    uint8_t bus_packed = 0;
+
+    bus_packed = BUS_PACK (bus);
+    ret = i2c_smbus_write_byte_data (fd, COMMAND_BUS, bus_packed);
+    if (ret == -1)
+        return ret;
+    return 0;
+}
+
 /* Pretty print data from parameter BUS structure.
  */
 void bus_pretty(ds1077l_bus_t* bus)
