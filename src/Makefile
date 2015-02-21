@@ -1,4 +1,4 @@
-.PHONY: all clean test
+.PHONY : all clean test
 
 PREFIX = ds1077l
 
@@ -25,12 +25,12 @@ MUXTEST_BIN = ${PREFIX}-mux_test
 MUXTEST_OBJ = ${MUXTEST_BIN}.o
 MUXTEST_SRC = ${MUXTEST_BIN}.c
 
-BINS=${BUSSET_BIN} ${DUMP_BIN}
-OBJS=${COMMON_OBJ} ${DUMP_OBJ}
-TESTS=${BUSTEST_BIN} ${DIVTEST_BIN} ${MUXTEST_BIN}
+BINS = ${BUSSET_BIN} ${DUMP_BIN}
+OBJS = ${COMMON_OBJ} ${DUMP_OBJ}
+TESTS = ${BUSTEST_BIN} ${DIVTEST_BIN} ${MUXTEST_BIN}
 
-all: ${BINS} ${TESTS}
-clean:
+all : ${BINS} ${TESTS}
+clean :
 	rm -f ${BINS} ${OBJS} ${TESTS}
 test : ${TESTS}
 
