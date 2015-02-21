@@ -1,3 +1,4 @@
+src/ds1077l-bus-set
 src/ds1077l-dump
 src/*.o
 src/ds1077l-*_test
