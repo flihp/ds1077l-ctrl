@@ -1,2 +1,3 @@
 src/ds1077l-dump
 src/*.o
+src/ds1077l-*_test
