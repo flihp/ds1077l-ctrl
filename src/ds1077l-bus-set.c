@@ -112,10 +112,10 @@ main (int argc, char *argv[])
     int fd = 0;
     /* argument structure populated with defaults */
     bus_args_t bus_args = {
-        .address = 0x58,
-        .new_addr = 0x58,
+        .address = DS1077L_ADDR_DEFAULT,
+        .new_addr = DS1077L_ADDR_DEFAULT,
         .bus = "/dev/i2c-1",
-        .write_on_change = 0        
+        .write_on_change = DS1077L_WC_DEFAULT
     };
     if (argp_parse (&argps, argc, argv, 0, NULL, &bus_args)) {
         perror ("argp_parse: \n");

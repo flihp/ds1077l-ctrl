@@ -8,6 +8,7 @@
 
 /* properties */
 #define DS1077L_ADDR_DEFAULT 0x58
+#define DS1077L_WC_DEFAULT   0x0
 
 /* commands */
 #define COMMAND_DIV 0x01
