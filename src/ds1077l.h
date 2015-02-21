@@ -15,6 +15,18 @@ typedef struct ds1077l_bus {
     uint8_t address;
 } ds1077l_bus_t;
 
+typedef struct ds1077l_mux {
+    bool pdn1;
+    bool pdn0;
+    bool sel0;
+    bool en0;
+    uint8_t m0;
+    uint8_t m1;
+    bool div1;
+} ds1077l_mux_t;
+
 int handle_get(char* dev, uint8_t addr);
 int bus_get(int fd, ds1077l_bus_t* bus);
 void bus_pretty(ds1077l_bus_t* bus);
+int mux_get(int fd, ds1077l_mux_t* mux);
+void mux_pretty(ds1077l_mux_t* mux);

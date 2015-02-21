@@ -10,6 +10,7 @@
 int main(int argc, char* argv[])
 {
     ds1077l_bus_t bus = {0};
+    ds1077l_mux_t mux = {0};
     int fd = 0;
     char* dev_path = NULL;
 
@@ -36,5 +37,10 @@ int main(int argc, char* argv[])
         exit(1);
     }
     bus_pretty(&bus);
+    if (mux_get(fd, &mux) == -1) {
+        perror("mux_get: ");
+        exit(1);
+    }
+    mux_pretty(&mux);
     exit(0);
 }
