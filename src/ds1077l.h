@@ -8,7 +8,7 @@
 
 /* properties */
 #define DS1077L_ADDR_DEFAULT 0x58
-#define DS1077L_WC_DEFAULT   0x0
+#define DS1077L_WC_DEFAULT   true
 
 /* commands */
 #define COMMAND_DIV 0x01
@@ -26,10 +26,16 @@
  * | Factory Default | 0* | 0* | 0* | 0* | 0  | 0  | 0  | 0  |
  * +-----------------+----+----+----+----+----+----+----+----+
  * * These bits are reserved and must be set to zero.
+ *
+ * NOTE: the WC bit is reversed from what we would normally expect. When it's
+ *       set to 0 the DS1077L will write registers to EEPROM on any changes
+ *       and when it's set to 1 changes are written to EEPROM only on a WRITE
+ *       command. When we pack and unpack this bit we set the boolean in the
+ *       ds1077l_bus_t structure to true if this bit is 0 and false if it's 1.
  */
 #define ADDRESS_UNPACK(bus) (0x07 & bus | DS1077L_ADDR_DEFAULT)
-#define WC_UNPACK(bus)      (bus & 0x07)
-#define BUS_PACK(bus) ((bus->address & 0x7) | (bus->wc & 0x1) >> 4)
+#define WC_UNPACK(bus)      ((bus & 0x07) ? false : true)
+#define BUS_PACK(bus)       ((bus->address & 0x7) | ((bus->wc ? 0 : 1) & 0x1) >> 4)
 
 /* div register (un)?pack
  * Diagram taken from the spec sheet page 6.

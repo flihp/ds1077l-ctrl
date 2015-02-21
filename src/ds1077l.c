@@ -71,7 +71,7 @@ void bus_pretty(ds1077l_bus_t* bus)
     printf("    A2: %#x\n", bus->address & 0x4);
     printf("    A1: %#x\n", bus->address & 0x2);
     printf("    A0: %#x\n", bus->address & 0x1);
-    printf("  WC: %#x\n", bus->wc);
+    printf("  WC: %s\n", bus->wc ? "true" : "false");
 }
 
 static int mux_from_int(ds1077l_mux_t* mux, int32_t word)

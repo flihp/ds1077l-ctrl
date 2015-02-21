@@ -83,13 +83,15 @@ parse_opts (int key, char *arg, struct argp_state *state)
             bus_args->new_addr = number;
             break;
         case 'w':
-            /* wc is either 0 or 1 */
-            if (strnlen (arg, 2) != 1)
+            /* wc is either "true" or "false" */
+            if (strnlen (arg, 5) == 4 &&
+                strncmp ("true", arg, 4) == 0)
+                bus_args->write_on_change = true;
+            else if (strnlen (arg, 6) == 5 &&
+                     strncmp ("false", arg, 5) == 0)
+                bus_args->write_on_change = false;
+            else
                 argp_usage (state);
-            number = strtol (arg, NULL, 10);
-            if (number < 0 | number > 1)
-                argp_usage (state);
-            bus_args->write_on_change = number;
             break;
         default:
             return ARGP_ERR_UNKNOWN;
@@ -103,7 +105,8 @@ bus_args_dump (bus_args_t *bus_args)
     printf ("address:         0x%x\n", bus_args->address);
     printf ("new_addr:        0x%x\n", bus_args->new_addr);
     printf ("bus:             %s\n",   bus_args->bus);
-    printf ("write_on_change: 0x%x\n", bus_args->write_on_change);
+    printf ("write_on_change: %s\n",
+            bus_args->write_on_change ? "true" : "false");
 }
 
 int
