@@ -34,8 +34,10 @@
  *       ds1077l_bus_t structure to true if this bit is 0 and false if it's 1.
  */
 #define ADDRESS_UNPACK(bus) (0x07 & bus | DS1077L_ADDR_DEFAULT)
-#define WC_UNPACK(bus)      ((bus & 0x07) ? false : true)
-#define BUS_PACK(bus)       ((bus->address & 0x7) | ((bus->wc ? 0 : 1) & 0x1) >> 4)
+#define WC_UNPACK(bus)      ((bus & 0x08) ? false : true)
+#define ADDRESS_PACK(address) (address & 0x07)
+#define WC_PACK(wc) (((wc ? 0 : 1) & 0x01) << 3)
+#define BUS_PACK(bus)       (ADDRESS_PACK(bus->address) | WC_PACK(bus->wc))
 
 /* div register (un)?pack
  * Diagram taken from the spec sheet page 6.
