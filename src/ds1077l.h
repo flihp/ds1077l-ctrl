@@ -60,6 +60,7 @@
  * Also see note on adding 2 to the N value (bottom of page 6).
  */
 #define DIV_UNPACK(div) (((div & 0xFF) << 2 | (div & 0xc000) >> 14) + 2)
+#define DIV_PACK(div)   ((((div - 2) >> 2) & 0xFF) | ((div - 2) & 0x3) << 14) 
 
 /* mux register (un)?pack
  * Diagram taken from the spec sheet page 5.

@@ -27,5 +27,15 @@ int main(void)
     printf("div: 0x%x\n", DIV_UNPACK(0x4011));
     printf("div: 0x%x\n", DIV_UNPACK(0x7f11));
 
+    /*  div: 0x8000  */
+    printf ("should be: 0x8000\n");
+    printf ("packed div: 0x%x\n", DIV_PACK(0x0004));
+    printf ("should be: 0x8002\n");
+    printf ("packed div: 0x%x\n", DIV_PACK(0x000c));
+    printf ("should be: 0x8030\n");
+    printf ("packed div: 0x%x\n", DIV_PACK(0x00c4));
+    printf ("should be: 0xc0c3\n");
+    printf ("packed div: 0x%x\n", DIV_PACK(0x7f11));
+
     return 0;
 }

@@ -132,6 +132,22 @@ int div_get(int fd, ds1077l_div_t* div)
     return 0;
 }
 
+/* Set the div register on the device represented by fd with the values in the
+ * provided ds1077l_div_t object.
+ */
+int
+div_set (int fd, ds1077l_div_t *div)
+{
+    int ret = 0;
+    uint16_t div_packed = 0;
+
+    div_packed = DIV_PACK(div->n);
+    ret = i2c_smbus_write_word_data (fd, COMMAND_DIV, div_packed);
+    if (ret == -1)
+        return ret;
+    return 0;
+}
+
 /* Map prescalar values to divisor.
  */
 inline uint8_t decode_prescalar(uint8_t m)

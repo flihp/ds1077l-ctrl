@@ -63,7 +63,7 @@ parse_opts (int key, char *arg, struct argp_state *state)
             if (div_args->address < 0x58 | div_args->address > 0x5f)
                 argp_usage (state);
             break;
-        case 'b':
+        case 'd':
             /* path to bus device node is validated in the main program */
             div_args->bus_dev = arg;
             break;
@@ -122,20 +122,16 @@ main (int argc, char *argv[])
         exit (1);
     }
     printf ("Current DIV register state:\n");
+    /* populate new structure, display to user, and make change */
     div_pretty (&div);
-    /* populate new structure, display to user, and make change
-    if (bus_args.new_addr_set)
-        bus.address = bus_args.new_addr;
-    if (bus_args.write_on_change_set)
-        bus.wc = bus_args.write_on_change;
+    div.n = div_args.divider;
     printf ("Setting device 0x%x on bus %s to:\n",
-            bus_args.address, bus_args.bus);
-    bus_pretty (&bus);
-    if (bus_set (fd, &bus)) {
-        perror ("bus_set: ");
+            div_args.address, div_args.bus_dev);
+    div_pretty (&div);
+    if (div_set (fd, &div)) {
+        perror ("div_set: ");
         exit (1);
     }
-    */
     exit (1);
 }
 
