@@ -7,11 +7,12 @@
  */
 
 /* stuff */
-#define I2C_BUS_DEVICE "/dev/i2c-2"
+#define I2C_BUS_DEVICE "/dev/i2c-1"
 
 /* properties */
 #define DS1077L_ADDR_DEFAULT 0x58
 #define DS1077L_WC_DEFAULT   true
+#define DS1077L_N_DEFAULT    0X2
 
 /* commands */
 #define COMMAND_DIV 0x01
