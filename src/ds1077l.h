@@ -6,6 +6,9 @@
  * http://datasheets.maximintegrated.com/en/ds/DS1077L.pdf
  */
 
+/* stuff */
+#define I2C_BUS_DEVICE "/dev/i2c-2"
+
 /* properties */
 #define DS1077L_ADDR_DEFAULT 0x58
 #define DS1077L_WC_DEFAULT   true
