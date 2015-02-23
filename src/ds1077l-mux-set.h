@@ -18,4 +18,5 @@ typedef struct mux_args {
     bool m1_set;
     bool div1;
     bool div1_set;
+    bool verbose;
 } mux_args_t;

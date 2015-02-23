@@ -29,6 +29,14 @@ const struct argp_option options[] = {
         .group = 0
     },
     {
+        .name  = "verbose",
+        .key   = 'v',
+        .arg   = 0,
+        .flags = 0,
+        .doc   = "Provide verbose output.",
+        .group = 0
+    },
+    {
         .name  = "pdn1",
         .key   = 'e',
         .arg   = "0|1",
@@ -111,6 +119,9 @@ parse_opts (int key, char *arg, struct argp_state *state)
             /* path to bus device node is validated in the main program */
             mux_args->bus_dev = arg;
             break;
+        case 'v':
+            mux_args->verbose = true;
+            break;
         case 'e':
             /* value for PDN1 bit, binary digit */
             mux_args->pdn1 = strtol (arg, NULL, 10);
@@ -171,13 +182,15 @@ parse_opts (int key, char *arg, struct argp_state *state)
 static void
 mux_args_dump (mux_args_t *mux_args)
 {
-    printf ("address: 0x%x\n", mux_args->address);
-    printf ("bus-dev: %s\n",   mux_args->bus_dev);
-    printf ("pdn1:    %s\n",   mux_args->pdn1 ? "true" : "false");
-    printf ("pdn0:    %s\n",   mux_args->pdn0 ? "true" : "false");
-    printf ("sel0:    %s\n",   mux_args->sel0 ? "true" : "false");
-    printf ("en0:     %s\n",   mux_args->en0  ? "true" : "false");
-    printf ("div1:    %s\n",   mux_args->div1 ? "true" : "false");
+    printf ("Use provided options:\n");
+    printf ("  address: 0x%x\n", mux_args->address);
+    printf ("  bus-dev: %s\n",   mux_args->bus_dev);
+    printf ("  verbose: %s\n",   mux_args->verbose ? "true" : "false");
+    printf ("  pdn1:    %s\n",   mux_args->pdn1 ? "true" : "false");
+    printf ("  pdn0:    %s\n",   mux_args->pdn0 ? "true" : "false");
+    printf ("  sel0:    %s\n",   mux_args->sel0 ? "true" : "false");
+    printf ("  en0:     %s\n",   mux_args->en0  ? "true" : "false");
+    printf ("  div1:    %s\n",   mux_args->div1 ? "true" : "false");
 }
 
 /* Populate a mux_args_t with default values.
@@ -261,31 +274,39 @@ main (int argc, char *argv[])
         perror ("argp_parse: \n");
         exit (1);
     }
-    mux_args_dump (&mux_args);
+    if (mux_args.verbose)
+        mux_args_dump (&mux_args);
     fd = handle_get (mux_args.bus_dev, mux_args.address);
     if (fd == -1) {
         perror ("handle_get: ");
         exit (1);
     }
+    if (mux_args.verbose)
+        printf ("Querying state of MUX register for device 0x%x on bus %s\n",
+               mux_args.address, mux_args.bus_dev);
     /* get current register state and display to user */
     if (mux_get (fd, &mux_current)) {
         perror ("mux_set: ");
         exit (1);
     }
-    printf ("Current MUX register state:\n");
-    mux_pretty (&mux_current);
+    if (mux_args.verbose)
+        mux_pretty (&mux_current);
     /* determine whether any values are bing changed, exit if not */
     mux_new = mux_current;
     mux_from_args (&mux_args, &mux_new);
-    printf ("Requested MUX register state:\n");
-    mux_pretty (&mux_new);
+    if (mux_args.verbose) {
+        printf ("Requested MUX register state:\n");
+        mux_pretty (&mux_new);
+    }
     if (mux_compare (&mux_current, &mux_new) == 0) {
         printf ("MUX register already in requested state. No change necessary.\n");
         exit (0);
     }
-    printf ("Setting MUX register for device 0x%x on bus %s to:\n",
-            mux_args.address, mux_args.bus_dev);
-    mux_pretty (&mux_new);
+    if (mux_args.verbose) {
+        printf ("Setting MUX register for device 0x%x on bus %s to:\n",
+                mux_args.address, mux_args.bus_dev);
+        mux_pretty (&mux_new);
+    }
     if (mux_set (fd, &mux_new)) {
         perror ("mux_set: ");
         exit (1);
