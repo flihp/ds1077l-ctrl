@@ -105,6 +105,22 @@ int mux_get(int fd, ds1077l_mux_t* mux)
     return 0;
 }
 
+int
+mux_set (int fd, ds1077l_mux_t *mux)
+{
+    int32_t ret = 0;
+    uint16_t mux_word = 0;
+
+    mux_word = (PDN1_PACK(mux->pdn1) | PDN0_PACK(mux->pdn0) | \
+                SEL0_PACK(mux->sel0) | EN0_PACK(mux->en0)   | \
+                M0_PACK(mux->m0)     | M1_PACK(mux->m1)     | \
+                DIV1_PACK(mux->div1));
+    ret = i2c_smbus_write_word_data (fd, COMMAND_MUX, mux_word);
+    if (ret == -1)
+        return -1;
+    return 0;
+}
+
 void mux_pretty(ds1077l_mux_t* mux)
 {
     if (mux == NULL)
@@ -146,6 +162,25 @@ div_set (int fd, ds1077l_div_t *div)
     if (ret == -1)
         return ret;
     return 0;
+}
+
+/* Map divisor values to prescalar.
+ */
+inline uint8_t
+encode_prescalar (uint8_t m)
+{
+    switch (m) {
+    case 1:
+        return 0;
+    case 2:
+        return 1;
+    case 4:
+        return 2;
+    case 8:
+        return 3;
+    default:
+        return -1;
+    }
 }
 
 /* Map prescalar values to divisor.

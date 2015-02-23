@@ -142,14 +142,16 @@ parse_opts (int key, char *arg, struct argp_state *state)
         case 'q':
             /* value for prescalar P0, powers of 2 between 1 and 8 */
             mux_args->m0 = strtol (arg, NULL, 10);
-            if (! mux_args->m0 & 0x0F)
+            if (! (mux_args->m0 == 1 || mux_args->m0 == 2 || \
+                   mux_args->m0 == 4 || mux_args->m0 == 8))
                 argp_usage (state);
             mux_args->m0_set = true;
             break;
         case 'r':
             /* value for prescalar P1, powers of 2 between 1 and 8 */
             mux_args->m1 = strtol (arg, NULL, 10);
-            if (! mux_args->m1 & 0x0F)
+            if (! (mux_args->m1 == 1 || mux_args->m1 == 2 || \
+                   mux_args->m1 == 4 || mux_args->m1 == 8))
                 argp_usage (state);
             mux_args->m1_set = true;
             break;
@@ -284,12 +286,10 @@ main (int argc, char *argv[])
     printf ("Setting MUX register for device 0x%x on bus %s to:\n",
             mux_args.address, mux_args.bus_dev);
     mux_pretty (&mux_new);
-    /*
     if (mux_set (fd, &mux_new)) {
         perror ("mux_set: ");
         exit (1);
     }
-    */
     exit (0);
 }
 
