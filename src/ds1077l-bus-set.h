@@ -6,6 +6,7 @@ typedef struct bus_args {
     uint8_t new_addr;
     bool new_addr_set;
     char *bus;
+    bool verbose;
     bool write_on_change;
     bool write_on_change_set;
 } bus_args_t;

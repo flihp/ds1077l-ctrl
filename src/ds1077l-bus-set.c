@@ -39,6 +39,14 @@ const struct argp_option options[] = {
         .group = 0
     },
     {
+        .name  = "verbose",
+        .key   = 'v',
+        .arg   = 0,
+        .flags = 0,
+        .doc   = "Produce verbose output.",
+        .group = 0
+    },
+    {
         .name  = "bus",
         .key   = 'b',
         .arg   = "bus-device",
@@ -83,6 +91,9 @@ parse_opts (int key, char *arg, struct argp_state *state)
             bus_args->new_addr = number;
             bus_args->new_addr_set = true;
             break;
+        case 'v':
+            bus_args->verbose = true;
+            break;
         case 'w':
             /* wc is either "true" or "false" */
             if (strnlen (arg, 5) == 4 &&
@@ -104,10 +115,12 @@ parse_opts (int key, char *arg, struct argp_state *state)
 static void
 bus_args_dump (bus_args_t *bus_args)
 {
-    printf ("address:         0x%x\n", bus_args->address);
-    printf ("new_addr:        0x%x\n", bus_args->new_addr);
-    printf ("bus:             %s\n",   bus_args->bus);
-    printf ("write_on_change: %s\n",
+    printf ("User provided options:\n");
+    printf ("  address:         0x%x\n", bus_args->address);
+    printf ("  new_addr:        0x%x\n", bus_args->new_addr);
+    printf ("  bus:             %s\n",   bus_args->bus);
+    printf ("  verbose:         %s\n",   bus_args->verbose ? "true" : "false");
+    printf ("  write_on_change: %s\n",
             bus_args->write_on_change ? "true" : "false");
 }
 
@@ -134,6 +147,8 @@ main (int argc, char *argv[])
         fprintf(stderr, "Either a new address or a new value for the wc bit must be provided.\n");
         exit (1);
     }
+    if (bus_args.verbose)
+        bus_args_dump (&bus_args);
     fd = handle_get (bus_args.bus, bus_args.address);
     if (fd == -1) {
         perror ("handle_get: ");
@@ -144,16 +159,20 @@ main (int argc, char *argv[])
         perror ("bus_set: ");
         exit (1);
     }
-    printf ("Current BUS register state:\n");
-    bus_pretty (&bus);
+    if (bus_args.verbose) {
+        printf ("Current BUS register state:\n");
+        bus_pretty (&bus);
+    }
     /* populate new structure, display to user, and make change */
     if (bus_args.new_addr_set)
         bus.address = bus_args.new_addr;
     if (bus_args.write_on_change_set)
         bus.wc = bus_args.write_on_change;
-    printf ("Setting device 0x%x on bus %s to:\n",
-            bus_args.address, bus_args.bus);
-    bus_pretty (&bus);
+    if (bus_args.verbose) {
+        printf ("Setting device 0x%x on bus %s to:\n",
+                bus_args.address, bus_args.bus);
+        bus_pretty (&bus);
+    }
     if (bus_set (fd, &bus)) {
         perror ("bus_set: ");
         exit (1);
