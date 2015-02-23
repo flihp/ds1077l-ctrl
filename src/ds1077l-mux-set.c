@@ -111,35 +111,35 @@ parse_opts (int key, char *arg, struct argp_state *state)
             /* path to bus device node is validated in the main program */
             mux_args->bus_dev = arg;
             break;
-        case 'p':
+        case 'e':
             /* value for PDN1 bit, binary digit */
             mux_args->pdn1 = strtol (arg, NULL, 10);
             if (mux_args->pdn1 < 0x0 | mux_args->pdn1 > 0x1)
                 argp_usage (state);
             mux_args->pdn1_set = true;
             break;
-        case 'q':
+        case 'f':
             /* value for PDN0 bit, binary digit */
             mux_args->pdn0 = strtol (arg, NULL, 10);
             if (mux_args->pdn0 < 0x0 | mux_args->pdn0 > 0x1)
                 argp_usage (state);
             mux_args->pdn0_set = true;
             break;
-        case 's':
+        case 'g':
             /* value for SEL0 bit, binary digit */
             mux_args->sel0 = strtol (arg, NULL, 10);
             if (mux_args->sel0 < 0x0 | mux_args->sel0 > 0x1)
                 argp_usage (state);
             mux_args->sel0_set = true;
             break;
-        case 'e':
+        case 'h':
             /*value for EN0 bit, binary digit */
             mux_args->en0 = strtol (arg, NULL, 10);
             if (mux_args->en0 < 0x0 | mux_args->en0 > 0x1)
                 argp_usage (state);
             mux_args->en0_set = true;
             break;
-        case 'c':
+        case 'q':
             /* value for prescalar P0, powers of 2 between 1 and 8 */
             mux_args->m0 = strtol (arg, NULL, 10);
             if (! mux_args->m0 & 0x0F)
@@ -153,7 +153,7 @@ parse_opts (int key, char *arg, struct argp_state *state)
                 argp_usage (state);
             mux_args->m1_set = true;
             break;
-        case 'v':
+        case 'w':
             /* value for DIV1 bit, binary digit */
             mux_args->div1 = strtol (arg, NULL, 10);
             if (mux_args->div1 & 0xFE)
@@ -281,18 +281,15 @@ main (int argc, char *argv[])
         printf ("MUX register already in requested state. No change necessary.\n");
         exit (0);
     }
-
-    printf ("dones\n");
-    exit (1);
-    /*
-    printf ("Setting device 0x%x on bus %s to:\n",
+    printf ("Setting MUX register for device 0x%x on bus %s to:\n",
             mux_args.address, mux_args.bus_dev);
     mux_pretty (&mux_new);
+    /*
     if (mux_set (fd, &mux_new)) {
         perror ("mux_set: ");
         exit (1);
     }
-    exit (0);
     */
+    exit (0);
 }
 
