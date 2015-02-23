@@ -33,6 +33,14 @@ const struct argp_option options[] = {
         .doc   = "The address of the socilator.",
         .group = 0
     },
+    {
+        .name  = "verbose",
+        .key   = 'v',
+        .arg   = 0,
+        .flags = 0,
+        .doc   = "Produce verbose output.",
+        .group = 0
+    },
     {0}
 };
 
@@ -57,6 +65,9 @@ parse_opts (int key, char *arg, struct argp_state *state)
             if (dump_args->address < 0x58 || dump_args->address > 0x5f)
                 argp_usage (state);
             break;
+        case 'v':
+            dump_args->verbose = true;
+            break;
         default:
             return ARGP_ERR_UNKNOWN;
     }
@@ -66,8 +77,10 @@ parse_opts (int key, char *arg, struct argp_state *state)
 static void
 dump_args_dump (dump_args_t *dump_args)
 {
-    printf ("address: 0x%x\n", dump_args->address);
-    printf ("bus-dev: %s\n", dump_args->bus_dev);
+    printf ("User provided options:\n");
+    printf ("  bus-dev: %s\n", dump_args->bus_dev);
+    printf ("  address: 0x%x\n", dump_args->address);
+    printf ("  verbose: %s\n", dump_args->verbose ? "true" : "false");
 }
 
 int main(int argc, char* argv[])
@@ -80,17 +93,22 @@ int main(int argc, char* argv[])
     dump_args_t dump_args = {
         .address = DS1077L_ADDR_DEFAULT,
         .bus_dev = I2C_BUS_DEVICE,
+        .verbose = false,
     };
 
     if (argp_parse (&argps, argc, argv, 0, NULL, &dump_args)) {
         perror ("argp_parse: \n");
         exit (1);
     }
+    if (dump_args.verbose == true)
+        dump_args_dump (&dump_args);
     fd = handle_get (dump_args.bus_dev, dump_args.address);
     if (fd == -1) {
         perror("handle_get: ");
         exit(1);
     }
+    printf ("Current state of device 0x%x on bus %s:\n",
+             dump_args.address, dump_args.bus_dev);
     if (bus_get(fd, &bus) == -1) {
         perror("bus_get: ");
         exit(1);
