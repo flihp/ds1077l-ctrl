@@ -8,4 +8,5 @@ typedef struct div_args {
     char *bus_dev;
     uint16_t divider;
     bool divider_set;
+    bool verbose;
 } div_args_t;

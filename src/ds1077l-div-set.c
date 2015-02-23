@@ -40,6 +40,14 @@ const struct argp_option options[] = {
         .doc   = "Value of the programmable divider on OUT1.",
         .group = 0
     },
+    {
+        .name  = "verbose",
+        .key   = 'v',
+        .arg   = 0,
+        .flags = 0,
+        .doc   = "Produce verbose output.",
+        .group = 0
+    },
     { 0 }
 };
 
@@ -74,6 +82,9 @@ parse_opts (int key, char *arg, struct argp_state *state)
                 argp_usage (state);
             div_args->divider_set = true;
             break;
+        case 'v':
+            div_args->verbose = true;
+            break;
         default:
             return ARGP_ERR_UNKNOWN;
     }
@@ -83,9 +94,11 @@ parse_opts (int key, char *arg, struct argp_state *state)
 static void
 div_args_dump (div_args_t *div_args)
 {
-    printf ("address: 0x%x\n", div_args->address);
-    printf ("bus-dev: %s\n",   div_args->bus_dev);
-    printf ("divider: %d\n",   div_args->divider);
+    printf ("User provided options:\n");
+    printf ("  address: 0x%x\n", div_args->address);
+    printf ("  bus-dev: %s\n",   div_args->bus_dev);
+    printf ("  divider: %d\n",   div_args->divider);
+    printf ("  verbose: %s\n",   div_args->verbose ? "true" : "false");
 }
 
 int
@@ -109,25 +122,30 @@ main (int argc, char *argv[])
         argp_help (&argps, stderr, ARGP_HELP_USAGE, NULL);
         exit (1);
     }
-    printf ("");
-    div_args_dump (&div_args);
+    if (div_args.verbose)
+        div_args_dump (&div_args);
     fd = handle_get (div_args.bus_dev, div_args.address);
     if (fd == -1) {
         perror ("handle_get: ");
         exit (1);
     }
     /* get current register state and display to user */
+    if (div_args.verbose)
+        printf ("Querying status of DEV register for device 0x%x on bus %s\n",
+               div_args.address, div_args.bus_dev);
     if (div_get (fd, &div)) {
         perror ("div_set: ");
         exit (1);
     }
-    printf ("Current DIV register state:\n");
+    if (div_args.verbose)
+        div_pretty (&div);
     /* populate new structure, display to user, and make change */
-    div_pretty (&div);
     div.n = div_args.divider;
-    printf ("Setting device 0x%x on bus %s to:\n",
-            div_args.address, div_args.bus_dev);
-    div_pretty (&div);
+    if (div_args.verbose) {
+        printf ("Setting device 0x%x on bus %s to:\n",
+                div_args.address, div_args.bus_dev);
+        div_pretty (&div);
+    }
     if (div_set (fd, &div)) {
         perror ("div_set: ");
         exit (1);
