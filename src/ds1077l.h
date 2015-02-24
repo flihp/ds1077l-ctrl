@@ -1,8 +1,9 @@
-#include <stdint.h>
-#include <stdbool.h>
-
 #ifndef _DS1077L_H_
 #define _DS1077L_H_
+
+#include <argp.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 /* Addresses, structures and other shit as adapted from the spec sheet for the
  * Maxim DS1077L oscillator. For definitive data consult the spec sheet:
@@ -130,6 +131,16 @@ typedef struct ds1077l_div {
     uint16_t n;
 } ds1077l_div_t;
 
+typedef struct ds1077l_common_args {
+    uint16_t address;
+    char *bus_dev;
+    bool verbose;
+} ds1077l_common_args_t;
+
+/* If memory serves I'm not supposed to do this. */
+extern const struct argp common_argp;
+extern const struct argp_option common_options[];
+
 int handle_get(char* dev, uint8_t addr);
 int bus_get(int fd, ds1077l_bus_t* bus);
 int bus_set (int fd, ds1077l_bus_t *bus);
@@ -141,5 +152,6 @@ int div_get(int fd, ds1077l_div_t* div);
 void div_pretty(ds1077l_div_t* div);
 inline uint8_t encode_prescalar(uint8_t m);
 inline uint8_t decode_prescalar(uint8_t m);
+error_t parse_common_opts (int key, char *arg, struct argp_state *state);
 
 #endif // #ifndef _DS1077L_H_
