@@ -1,6 +1,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifndef _DS1077L_H_
+#define _DS1077L_H_
+
 /* Addresses, structures and other shit as adapted from the spec sheet for the
  * Maxim DS1077L oscillator. For definitive data consult the spec sheet:
  * http://datasheets.maximintegrated.com/en/ds/DS1077L.pdf
@@ -138,3 +141,5 @@ int div_get(int fd, ds1077l_div_t* div);
 void div_pretty(ds1077l_div_t* div);
 inline uint8_t encode_prescalar(uint8_t m);
 inline uint8_t decode_prescalar(uint8_t m);
+
+#endif // #ifndef _DS1077L_H_
