@@ -20,6 +20,22 @@ const struct argp_option options[] = {
         .group = 0
     },
     {
+        .name  = "bus",
+        .key   = 'b',
+        .arg   = "bus-device",
+        .flags = OPTION_ARG_OPTIONAL,
+        .doc   = "Path to the i2c bus the timer is attached to.",
+        .group = 0
+    },
+    {
+        .name  = "verbose",
+        .key   = 'v',
+        .arg   = 0,
+        .flags = 0,
+        .doc   = "Produce verbose output.",
+        .group = 0
+     },
+     {
         .name  = "new-addr",
         .key   = 'n',
         .arg   = "hex-num",
@@ -36,22 +52,6 @@ const struct argp_option options[] = {
         .doc   = "When set to 0 all changes to registers will be written to "
                  "EEPROM. When set to 1, an explicit WRITE command is "
                  "required.",
-        .group = 0
-    },
-    {
-        .name  = "verbose",
-        .key   = 'v',
-        .arg   = 0,
-        .flags = 0,
-        .doc   = "Produce verbose output.",
-        .group = 0
-    },
-    {
-        .name  = "bus",
-        .key   = 'b',
-        .arg   = "bus-device",
-        .flags = OPTION_ARG_OPTIONAL,
-        .doc   = "Path to the i2c bus the timer is attached to.",
         .group = 0
     },
     { 0 }
@@ -83,6 +83,9 @@ parse_opts (int key, char *arg, struct argp_state *state)
             /* path to bus device node is validated in the main program */
             bus_args->bus = arg;
             break;
+        case 'v':
+            bus_args->verbose = true;
+            break;
         case 'n':
             /* same as above */
             number = strtol (arg, NULL, 16);
@@ -90,9 +93,6 @@ parse_opts (int key, char *arg, struct argp_state *state)
                 argp_usage (state);
             bus_args->new_addr = number;
             bus_args->new_addr_set = true;
-            break;
-        case 'v':
-            bus_args->verbose = true;
             break;
         case 'w':
             /* wc is either "true" or "false" */
