@@ -2,8 +2,7 @@
 #include <stdint.h>
 
 typedef struct mux_args {
-    uint8_t address;
-    char *bus_dev;
+    ds1077l_common_args_t common_args;
     bool pdn1;
     bool pdn1_set;
     bool pdn0;
@@ -18,5 +17,4 @@ typedef struct mux_args {
     bool m1_set;
     bool div1;
     bool div1_set;
-    bool verbose;
 } mux_args_t;

@@ -7,35 +7,11 @@
 #include <unistd.h>
 
 static void mux_args_dump (mux_args_t *mux_args);
+void mux_args_init (mux_args_t *mux_args);
 static error_t parse_opts (int key, char *arg, struct argp_state *state);
 
 /* arguments */
 const struct argp_option options[] = {
-    {
-        .name  = "address",
-        .key   = 'a',
-        .arg   = "0x58-0x5f",
-        .flags = OPTION_ARG_OPTIONAL,
-        .doc   = "The address of the oscillator. Defaults to 0x58.",
-        .group = 0
-    },
-    {
-        .name  = "bus-dev",
-        .key   = 'd',
-        .arg   = I2C_BUS_DEVICE,
-        .flags = OPTION_ARG_OPTIONAL,
-        .doc   = "Path to the device representing the i2c bus the oscillator "
-                 "is attached to.",
-        .group = 0
-    },
-    {
-        .name  = "verbose",
-        .key   = 'v',
-        .arg   = 0,
-        .flags = 0,
-        .doc   = "Provide verbose output.",
-        .group = 0
-    },
     {
         .name  = "pdn1",
         .key   = 'e',
@@ -95,33 +71,33 @@ const struct argp_option options[] = {
     { 0 }
 };
 
+const struct argp_child argp_children[] = {
+    {
+        .argp   = &common_argp,
+        .flags  = 0,
+        .header = NULL,
+        .group  = 0
+    },
+    { 0 }
+};
+
 const struct argp argps = {
-    options,
-    parse_opts,
-    NULL,
-    "Set values in the MUX register of a Maxim DS1077L programmable oscillator."
+    .options     = options,
+    .parser      = parse_opts,
+    .args_doc    = NULL,
+    .doc         = "Set values in the MUX register of a Maxim DS1077L "
+                   "programmable oscillator.",
+    .children    = argp_children,
+    .help_filter = NULL,
+    .argp_domain = NULL,
 };
 
 static error_t
 parse_opts (int key, char *arg, struct argp_state *state)
 {
     mux_args_t* mux_args = state->input;
-    uint32_t number = 0;
 
     switch (key) {
-        case 'a':
-            /* address is unsigned 8bit integer between 0x58 and 0x5f */
-            mux_args->address = strtol (arg, NULL, 16);
-            if (mux_args->address < 0x58 | mux_args->address > 0x5f)
-                argp_usage (state);
-            break;
-        case 'd':
-            /* path to bus device node is validated in the main program */
-            mux_args->bus_dev = arg;
-            break;
-        case 'v':
-            mux_args->verbose = true;
-            break;
         case 'e':
             /* value for PDN1 bit, binary digit */
             mux_args->pdn1 = strtol (arg, NULL, 10);
@@ -173,6 +149,10 @@ parse_opts (int key, char *arg, struct argp_state *state)
                 argp_usage (state);
             mux_args->div1_set = true;
             break;
+        case ARGP_KEY_INIT:
+            mux_args_init (mux_args);
+            state->child_inputs[0] = &(mux_args->common_args);
+            break;
         default:
             return ARGP_ERR_UNKNOWN;
     }
@@ -183,9 +163,9 @@ static void
 mux_args_dump (mux_args_t *mux_args)
 {
     printf ("Use provided options:\n");
-    printf ("  address: 0x%x\n", mux_args->address);
-    printf ("  bus-dev: %s\n",   mux_args->bus_dev);
-    printf ("  verbose: %s\n",   mux_args->verbose ? "true" : "false");
+    printf ("  address: 0x%x\n", mux_args->common_args.address);
+    printf ("  bus-dev: %s\n",   mux_args->common_args.bus_dev);
+    printf ("  verbose: %s\n",   mux_args->common_args.verbose ? "true" : "false");
     printf ("  pdn1:    %s\n",   mux_args->pdn1 ? "true" : "false");
     printf ("  pdn0:    %s\n",   mux_args->pdn0 ? "true" : "false");
     printf ("  sel0:    %s\n",   mux_args->sel0 ? "true" : "false");
@@ -198,8 +178,6 @@ mux_args_dump (mux_args_t *mux_args)
 void
 mux_args_init (mux_args_t *mux_args)
 {
-    mux_args->address  = DS1077L_ADDR_DEFAULT;
-    mux_args->bus_dev  = I2C_BUS_DEVICE;
     mux_args->pdn1     = DS1077L_PDN1_DEFAULT;
     mux_args->pdn1_set = false;
     mux_args->pdn0     = DS1077L_PDN0_DEFAULT;
@@ -264,9 +242,7 @@ int
 main (int argc, char *argv[])
 {
     int fd = 0;
-    /* argument structure populated with defaults */
     mux_args_t mux_args = {0};
-    mux_args_init (&mux_args);
     ds1077l_mux_t mux_new = {0};
     ds1077l_mux_t mux_current = {0};
 
@@ -274,27 +250,28 @@ main (int argc, char *argv[])
         perror ("argp_parse: \n");
         exit (1);
     }
-    if (mux_args.verbose)
+    if (mux_args.common_args.verbose)
         mux_args_dump (&mux_args);
-    fd = handle_get (mux_args.bus_dev, mux_args.address);
+    fd = handle_get (mux_args.common_args.bus_dev,
+                     mux_args.common_args.address);
     if (fd == -1) {
         perror ("handle_get: ");
         exit (1);
     }
-    if (mux_args.verbose)
+    if (mux_args.common_args.verbose)
         printf ("Querying state of MUX register for device 0x%x on bus %s\n",
-               mux_args.address, mux_args.bus_dev);
+               mux_args.common_args.address, mux_args.common_args.bus_dev);
     /* get current register state and display to user */
     if (mux_get (fd, &mux_current)) {
         perror ("mux_set: ");
         exit (1);
     }
-    if (mux_args.verbose)
+    if (mux_args.common_args.verbose)
         mux_pretty (&mux_current);
     /* determine whether any values are bing changed, exit if not */
     mux_new = mux_current;
     mux_from_args (&mux_args, &mux_new);
-    if (mux_args.verbose) {
+    if (mux_args.common_args.verbose) {
         printf ("Requested MUX register state:\n");
         mux_pretty (&mux_new);
     }
@@ -302,9 +279,9 @@ main (int argc, char *argv[])
         printf ("MUX register already in requested state. No change necessary.\n");
         exit (0);
     }
-    if (mux_args.verbose) {
+    if (mux_args.common_args.verbose) {
         printf ("Setting MUX register for device 0x%x on bus %s to:\n",
-                mux_args.address, mux_args.bus_dev);
+                mux_args.common_args.address, mux_args.common_args.bus_dev);
         mux_pretty (&mux_new);
     }
     if (mux_set (fd, &mux_new)) {
