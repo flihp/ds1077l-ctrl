@@ -33,19 +33,19 @@ const struct argp_option options[] = {
         .group = 0
     },
     {
-        .name  = "divider",
-        .key   = 'n',
-        .arg   = "2 - 1025",
-        .flags = 0,
-        .doc   = "Value of the programmable divider on OUT1.",
-        .group = 0
-    },
-    {
         .name  = "verbose",
         .key   = 'v',
         .arg   = 0,
         .flags = 0,
         .doc   = "Produce verbose output.",
+        .group = 0
+    },
+    {
+        .name  = "divider",
+        .key   = 'n',
+        .arg   = "2 - 1025",
+        .flags = 0,
+        .doc   = "Value of the programmable divider on OUT1.",
         .group = 0
     },
     { 0 }
@@ -75,15 +75,15 @@ parse_opts (int key, char *arg, struct argp_state *state)
             /* path to bus device node is validated in the main program */
             div_args->bus_dev = arg;
             break;
+        case 'v':
+            div_args->verbose = true;
+            break;
         case 'n':
             /* n divider value, between 2 and 1025 decimal */
             div_args->divider = strtol (arg, NULL, 10);
             if (div_args->divider < 0x2 | div_args->divider > 0x401)
                 argp_usage (state);
             div_args->divider_set = true;
-            break;
-        case 'v':
-            div_args->verbose = true;
             break;
         default:
             return ARGP_ERR_UNKNOWN;
