@@ -4,9 +4,7 @@
 #include <stdint.h>
 
 typedef struct div_args {
-    uint8_t address;
-    char *bus_dev;
+    ds1077l_common_args_t common_args;
     uint16_t divider;
     bool divider_set;
-    bool verbose;
 } div_args_t;
