@@ -10,31 +10,6 @@ static void bus_args_dump (bus_args_t *bus_args);
 static error_t parse_opts (int key, char *arg, struct argp_state *state);
 
 const struct argp_option options[] = {
-    {
-        .name  = "address",
-        .key   = 'a',
-        .arg   = "hex-num",
-        .flags = OPTION_ARG_OPTIONAL,
-        .doc   = "The current address of the timer, between 0x58 and 0x5f. "
-                 "Defaults to 0x58.",
-        .group = 0
-    },
-    {
-        .name  = "bus",
-        .key   = 'b',
-        .arg   = "bus-device",
-        .flags = OPTION_ARG_OPTIONAL,
-        .doc   = "Path to the i2c bus the timer is attached to.",
-        .group = 0
-    },
-    {
-        .name  = "verbose",
-        .key   = 'v',
-        .arg   = 0,
-        .flags = 0,
-        .doc   = "Produce verbose output.",
-        .group = 0
-     },
      {
         .name  = "new-addr",
         .key   = 'n',
@@ -57,41 +32,36 @@ const struct argp_option options[] = {
     { 0 }
 };
 
+const struct argp_child argp_children[] = {
+    {
+        &common_argp,
+        0,
+        0,
+        0
+    },
+    { 0 }
+};
+
 const struct argp argps = {
     options,
     parse_opts,
     NULL,
-    "Set values in the BUS register of a Maxim DS1077L programmable oscillator."
+    "Set values in the BUS register of a Maxim DS1077L programmable oscillator.",
+    argp_children
 };
 
 static error_t
 parse_opts (int key, char *arg, struct argp_state *state)
 {
     bus_args_t* bus_args = state->input;
-    uint32_t number = 0;
 
     switch (key)
     {
-        case 'a':
-            /* address is unsigned 8bit integer between 0x58 and 0x5f */
-            number = strtol (arg, NULL, 16);
-            if (number < 0x58 | number > 0x5f)
-                argp_usage (state);
-            bus_args->address = number;
-            break;
-        case 'b':
-            /* path to bus device node is validated in the main program */
-            bus_args->bus = arg;
-            break;
-        case 'v':
-            bus_args->verbose = true;
-            break;
         case 'n':
             /* same as above */
-            number = strtol (arg, NULL, 16);
-            if (number < 0x58 | number > 0x5f)
+            bus_args->new_addr = strtol (arg, NULL, 16);
+            if (bus_args->new_addr < 0x58 | bus_args->new_addr > 0x5f)
                 argp_usage (state);
-            bus_args->new_addr = number;
             bus_args->new_addr_set = true;
             break;
         case 'w':
@@ -106,6 +76,13 @@ parse_opts (int key, char *arg, struct argp_state *state)
                 argp_usage (state);
             bus_args->write_on_change_set = true;
             break;
+        case ARGP_KEY_INIT:
+            bus_args->new_addr = DS1077L_ADDR_DEFAULT,
+            bus_args->new_addr_set = false,
+            bus_args->write_on_change = DS1077L_WC_DEFAULT,
+            bus_args->write_on_change_set = false,
+            state->child_inputs[0] = &(bus_args->common_args);
+            break;
         default:
             return ARGP_ERR_UNKNOWN;
     }
@@ -116,10 +93,10 @@ static void
 bus_args_dump (bus_args_t *bus_args)
 {
     printf ("User provided options:\n");
-    printf ("  address:         0x%x\n", bus_args->address);
+    printf ("  address:         0x%x\n", bus_args->common_args.address);
     printf ("  new_addr:        0x%x\n", bus_args->new_addr);
-    printf ("  bus:             %s\n",   bus_args->bus);
-    printf ("  verbose:         %s\n",   bus_args->verbose ? "true" : "false");
+    printf ("  bus:             %s\n",   bus_args->common_args.bus_dev);
+    printf ("  verbose:         %s\n",   bus_args->common_args.verbose ? "true" : "false");
     printf ("  write_on_change: %s\n",
             bus_args->write_on_change ? "true" : "false");
 }
@@ -129,14 +106,7 @@ main (int argc, char *argv[])
 {
     int fd = 0;
     /* argument structure populated with defaults */
-    bus_args_t bus_args = {
-        .address = DS1077L_ADDR_DEFAULT,
-        .new_addr = DS1077L_ADDR_DEFAULT,
-        .new_addr_set = false,
-        .bus = "/dev/i2c-1",
-        .write_on_change = DS1077L_WC_DEFAULT,
-        .write_on_change_set = false,
-    };
+    bus_args_t bus_args = {0};
     ds1077l_bus_t bus = {0};
 
     if (argp_parse (&argps, argc, argv, 0, NULL, &bus_args)) {
@@ -147,9 +117,10 @@ main (int argc, char *argv[])
         fprintf(stderr, "Either a new address or a new value for the wc bit must be provided.\n");
         exit (1);
     }
-    if (bus_args.verbose)
+    if (bus_args.common_args.verbose)
         bus_args_dump (&bus_args);
-    fd = handle_get (bus_args.bus, bus_args.address);
+    fd = handle_get (bus_args.common_args.bus_dev,
+                     bus_args.common_args.address);
     if (fd == -1) {
         perror ("handle_get: ");
         exit (1);
@@ -159,7 +130,7 @@ main (int argc, char *argv[])
         perror ("bus_set: ");
         exit (1);
     }
-    if (bus_args.verbose) {
+    if (bus_args.common_args.verbose) {
         printf ("Current BUS register state:\n");
         bus_pretty (&bus);
     }
@@ -168,9 +139,9 @@ main (int argc, char *argv[])
         bus.address = bus_args.new_addr;
     if (bus_args.write_on_change_set)
         bus.wc = bus_args.write_on_change;
-    if (bus_args.verbose) {
+    if (bus_args.common_args.verbose) {
         printf ("Setting device 0x%x on bus %s to:\n",
-                bus_args.address, bus_args.bus);
+                bus_args.common_args.address, bus_args.common_args.bus_dev);
         bus_pretty (&bus);
     }
     if (bus_set (fd, &bus)) {
