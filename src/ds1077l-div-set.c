@@ -60,7 +60,7 @@ parse_opts (int key, char *arg, struct argp_state *state)
             div_args->divider_set = true;
             break;
         case ARGP_KEY_INIT:
-            div_args->divider = 0x2;
+            div_args->divider = DS1077L_DIV_DEFAULT_UNPACKED;
             div_args->divider_set = false;
             state->child_inputs[0] = &(div_args->common_args);
             break;
