@@ -9,7 +9,7 @@ const struct argp_option common_options[] = {
     {
         .name  = "address",
         .key   = 'a',
-        .arg   = "hex-num",
+        .arg   = "0x5[8-f]",
         .flags = OPTION_ARG_OPTIONAL,
         .doc   = "The current address of the timer, between 0x58 and 0x5f. "
                  "Defaults to 0x58.",

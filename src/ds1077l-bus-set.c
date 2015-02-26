@@ -13,7 +13,7 @@ const struct argp_option options[] = {
      {
         .name  = "new-addr",
         .key   = 'n',
-        .arg   = "hex-num",
+        .arg   = "0x5[8-f]",
         .flags = OPTION_ARG_OPTIONAL,
         .doc   = "The new address to assign to the timer specified by the "
                  "\'address\' parameter",
