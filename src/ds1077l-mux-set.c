@@ -18,7 +18,7 @@ const struct argp_option options[] = {
         .arg   = "0|1",
         .flags = 0,
         .doc   = "Value to set for the PDN1 bit.",
-        .group = 0
+        .group = 1
     },
     {
         .name  = "pdn0",
@@ -26,7 +26,7 @@ const struct argp_option options[] = {
         .arg   = "0|1",
         .flags = 0,
         .doc   = "Value to set for the PDN0 bit.",
-        .group = 0
+        .group = 1
     },
     {
         .name  = "sel0",
@@ -34,7 +34,7 @@ const struct argp_option options[] = {
         .arg   = "0|1",
         .flags = 0,
         .doc   = "Value to set for the SEL0 bit.",
-        .group = 0
+        .group = 1
     },
     {
         .name  = "en0",
@@ -42,7 +42,7 @@ const struct argp_option options[] = {
         .arg   = "0|1",
         .flags = 0,
         .doc   = "Value to set for the EN0 bit.",
-        .group = 0
+        .group = 1
     },
     {
         .name  = "prescalar0",
@@ -50,7 +50,7 @@ const struct argp_option options[] = {
         .arg   = "1|2|4|8",
         .flags = 0,
         .doc   = "Value to set for the prescalar for OUT0.",
-        .group = 0
+        .group = 1
     },
     {
         .name  = "prescalar1",
@@ -58,7 +58,7 @@ const struct argp_option options[] = {
         .arg   = "1|2|4|8",
         .flags = 0,
         .doc   = "Value to set for the prescalar for OUT1.",
-        .group = 0
+        .group = 1
     },
     {
         .name  = "div1",
@@ -66,7 +66,7 @@ const struct argp_option options[] = {
         .arg   = "0|1",
         .flags = 0,
         .doc   = "Value to set for the DIV1 bit.",
-        .group = 0
+        .group = 1
     },
     { 0 }
 };
