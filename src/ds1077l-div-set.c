@@ -17,10 +17,10 @@ const struct argp_option options[] = {
     {
         .name  = "divider",
         .key   = 'n',
-        .arg   = "2 - 1025",
+        .arg   = "2-1025",
         .flags = 0,
         .doc   = "Value of the programmable divider on OUT1.",
-        .group = 0
+        .group = 1
     },
     { 0 }
 };
