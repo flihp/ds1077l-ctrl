@@ -1,3 +1,4 @@
+#include "ds1077l-div.h"
 #include "ds1077l-div-set.h"
 
 #include <argp.h>

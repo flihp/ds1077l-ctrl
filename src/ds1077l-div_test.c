@@ -1,4 +1,4 @@
-#include "ds1077l.h"
+#include "ds1077l-div.h"
 
 #include <stdint.h>
 #include <stdio.h>

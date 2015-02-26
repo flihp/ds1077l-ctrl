@@ -16,7 +16,7 @@
 /* properties */
 #define DS1077L_ADDR_DEFAULT 0x58
 #define DS1077L_WC_DEFAULT   false
-#define DS1077L_N_DEFAULT    0X2
+
 /* MUX WORD */
 #define DS1077L_PDN1_DEFAULT 0x0
 #define DS1077L_PDN0_DEFAULT 0x0
@@ -27,7 +27,6 @@
 #define DS1077L_DIV1_DEFAULT 0x0
 
 /* commands */
-#define COMMAND_DIV 0x01
 #define COMMAND_MUX 0x02
 #define COMMAND_BUS 0x0d
 #define COMMAND_E2_WRITE 0x3f
@@ -54,25 +53,6 @@
 #define ADDRESS_PACK(address) (address & 0x07)
 #define WC_PACK(wc) (((wc ? 1 : 0) & 0x01) << 3)
 #define BUS_PACK(bus)       (ADDRESS_PACK(bus->address) | WC_PACK(bus->wc))
-
-/* div register (un)?pack
- * Diagram taken from the spec sheet page 6.
- *
- * DIV WORD
- * MSB                                 LSB | MSB                         LSB |
- * +----+----+----+----+----+----+----+----+----+----+---+---+---+---+---+---+
- * | N9 | N8 | N7 | N6 | N5 | N4 | N3 | N2 | N1 | N0 | X | X | X | X | X | X |
- * +----+----+----+----+----+----+----+----+----+----+---+---+---+---+---+---+
- *              first data byte            |         second data byte
- *
- * The weird thing about this is that the first data byte comes off the bus
- * first. So the integer we get has these two bytes packed in the reverse
- * order.
- *
- * Also see note on adding 2 to the N value (bottom of page 6).
- */
-#define DIV_UNPACK(div) (((div & 0xFF) << 2 | (div & 0xc000) >> 14) + 2)
-#define DIV_PACK(div)   ((((div - 2) >> 2) & 0xFF) | ((div - 2) & 0x3) << 14) 
 
 /* mux register (un)?pack
  * Diagram taken from the spec sheet page 5.
@@ -127,10 +107,6 @@ typedef struct ds1077l_mux {
     bool div1;
 } ds1077l_mux_t;
 
-typedef struct ds1077l_div {
-    uint16_t n;
-} ds1077l_div_t;
-
 typedef struct ds1077l_common_args {
     uint16_t address;
     char *bus_dev;
@@ -148,8 +124,6 @@ void bus_pretty(ds1077l_bus_t* bus);
 int mux_get(int fd, ds1077l_mux_t* mux);
 int mux_set(int fd, ds1077l_mux_t *mux);
 void mux_pretty(ds1077l_mux_t* mux);
-int div_get(int fd, ds1077l_div_t* div);
-void div_pretty(ds1077l_div_t* div);
 inline uint8_t encode_prescalar(uint8_t m);
 inline uint8_t decode_prescalar(uint8_t m);
 error_t parse_common_opts (int key, char *arg, struct argp_state *state);
