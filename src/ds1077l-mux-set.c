@@ -45,19 +45,21 @@ const struct argp_option options[] = {
         .group = 1
     },
     {
-        .name  = "prescalar0",
+        .name  = "p0",
         .key   = 'q',
         .arg   = "1|2|4|8",
         .flags = 0,
-        .doc   = "Value to set for the prescalar for OUT0.",
+        .doc   = "Value to set for the prescalar for OUT0. This is the "
+                 "combination and mapping of the 0M0 and 0M1 bits.",
         .group = 1
     },
     {
-        .name  = "prescalar1",
+        .name  = "p1",
         .key   = 'r',
         .arg   = "1|2|4|8",
         .flags = 0,
-        .doc   = "Value to set for the prescalar for OUT1.",
+        .doc   = "Value to set for the prescalar for OUT2. This is the "
+                 "combination and mapping of the 1M0 and 1M1 bits.",
         .group = 1
     },
     {
