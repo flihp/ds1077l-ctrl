@@ -14,20 +14,21 @@ const struct argp_option options[] = {
         .name  = "new-addr",
         .key   = 'n',
         .arg   = "0x5[8-f]",
-        .flags = OPTION_ARG_OPTIONAL,
+        .flags = 0,
+        .flags = 0,
         .doc   = "The new address to assign to the timer specified by the "
                  "\'address\' parameter",
-        .group = 0
+        .group = 1
     },
     {
         .name  = "wc",
         .key   = 'w',
         .arg   = "flag",
-        .flags = OPTION_ARG_OPTIONAL,
+        .flags = 0,
         .doc   = "When set to 0 all changes to registers will be written to "
                  "EEPROM. When set to 1, an explicit WRITE command is "
                  "required.",
-        .group = 0
+        .group = 1
     },
     { 0 }
 };
