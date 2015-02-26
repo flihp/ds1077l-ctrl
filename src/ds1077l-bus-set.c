@@ -23,7 +23,7 @@ const struct argp_option options[] = {
     {
         .name  = "wc",
         .key   = 'w',
-        .arg   = "flag",
+        .arg   = "0|1",
         .flags = 0,
         .doc   = "When set to 0 all changes to registers will be written to "
                  "EEPROM. When set to 1, an explicit WRITE command is "
@@ -67,21 +67,16 @@ parse_opts (int key, char *arg, struct argp_state *state)
             break;
         case 'w':
             /* wc is either "true" or "false" */
-            if (strnlen (arg, 5) == 4 &&
-                strncmp ("true", arg, 4) == 0)
-                bus_args->write_on_change = true;
-            else if (strnlen (arg, 6) == 5 &&
-                     strncmp ("false", arg, 5) == 0)
-                bus_args->write_on_change = false;
-            else
+            bus_args->wc = strtol (arg, NULL, 16);
+            if (! (bus_args->wc == 0x0 || bus_args->wc == 0x1))
                 argp_usage (state);
-            bus_args->write_on_change_set = true;
+            bus_args->wc_set = true;
             break;
         case ARGP_KEY_INIT:
             bus_args->new_addr = DS1077L_ADDR_DEFAULT,
             bus_args->new_addr_set = false,
-            bus_args->write_on_change = DS1077L_WC_DEFAULT,
-            bus_args->write_on_change_set = false,
+            bus_args->wc = DS1077L_WC_DEFAULT,
+            bus_args->wc_set = false,
             state->child_inputs[0] = &(bus_args->common_args);
             break;
         default:
@@ -98,8 +93,7 @@ bus_args_dump (bus_args_t *bus_args)
     printf ("  new_addr:        0x%x\n", bus_args->new_addr);
     printf ("  bus:             %s\n",   bus_args->common_args.bus_dev);
     printf ("  verbose:         %s\n",   bus_args->common_args.verbose ? "true" : "false");
-    printf ("  write_on_change: %s\n",
-            bus_args->write_on_change ? "true" : "false");
+    printf ("  wc:              %s\n",   bus_args->wc ? "true" : "false");
 }
 
 int
@@ -114,7 +108,7 @@ main (int argc, char *argv[])
         perror ("argp_parse: \n");
         exit (1);
     }
-    if (! (bus_args.new_addr_set | bus_args.write_on_change_set)) {
+    if (! (bus_args.new_addr_set | bus_args.wc_set)) {
         fprintf(stderr, "Either a new address or a new value for the wc bit must be provided.\n");
         exit (1);
     }
@@ -138,8 +132,8 @@ main (int argc, char *argv[])
     /* populate new structure, display to user, and make change */
     if (bus_args.new_addr_set)
         bus.address = bus_args.new_addr;
-    if (bus_args.write_on_change_set)
-        bus.wc = bus_args.write_on_change;
+    if (bus_args.wc_set)
+        bus.wc = bus_args.wc;
     if (bus_args.common_args.verbose) {
         printf ("Setting device 0x%x on bus %s to:\n",
                 bus_args.common_args.address, bus_args.common_args.bus_dev);

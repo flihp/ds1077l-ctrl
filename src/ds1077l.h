@@ -15,7 +15,7 @@
 
 /* properties */
 #define DS1077L_ADDR_DEFAULT 0x58
-#define DS1077L_WC_DEFAULT   true
+#define DS1077L_WC_DEFAULT   false
 #define DS1077L_N_DEFAULT    0X2
 /* MUX WORD */
 #define DS1077L_PDN1_DEFAULT 0x0
@@ -50,9 +50,9 @@
  *       ds1077l_bus_t structure to true if this bit is 0 and false if it's 1.
  */
 #define ADDRESS_UNPACK(bus) (0x07 & bus | DS1077L_ADDR_DEFAULT)
-#define WC_UNPACK(bus)      ((bus & 0x08) ? false : true)
+#define WC_UNPACK(bus)      ((bus & 0x08) ? true : false)
 #define ADDRESS_PACK(address) (address & 0x07)
-#define WC_PACK(wc) (((wc ? 0 : 1) & 0x01) << 3)
+#define WC_PACK(wc) (((wc ? 1 : 0) & 0x01) << 3)
 #define BUS_PACK(bus)       (ADDRESS_PACK(bus->address) | WC_PACK(bus->wc))
 
 /* div register (un)?pack
