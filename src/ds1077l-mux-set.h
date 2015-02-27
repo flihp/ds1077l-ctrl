@@ -3,6 +3,8 @@
 
 typedef struct mux_args {
     ds1077l_common_args_t common_args;
+    bool get;
+    bool set;
     bool pdn1;
     bool pdn1_set;
     bool pdn0;

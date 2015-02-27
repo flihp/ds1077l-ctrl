@@ -14,12 +14,28 @@ static error_t parse_opts (int key, char *arg, struct argp_state *state);
 /* arguments */
 const struct argp_option options[] = {
     {
+        .name  = "get",
+        .key   = 'g',
+        .arg   = 0,
+        .flags = OPTION_ARG_OPTIONAL,
+        .doc   = "Get the contents of the MUX register.",
+        .group = 1
+    },
+    {
+        .name  = "set",
+        .key   = 's',
+        .arg   = 0,
+        .flags = OPTION_ARG_OPTIONAL,
+        .doc   = "Set the contents of the MUX register.",
+        .group = 1
+    },
+    {
         .name  = "pdn1",
         .key   = 'e',
         .arg   = "0|1",
         .flags = 0,
         .doc   = "Value to set for the PDN1 bit.",
-        .group = 1
+        .group = 2
     },
     {
         .name  = "pdn0",
@@ -27,23 +43,23 @@ const struct argp_option options[] = {
         .arg   = "0|1",
         .flags = 0,
         .doc   = "Value to set for the PDN0 bit.",
-        .group = 1
+        .group = 2
     },
     {
         .name  = "sel0",
-        .key   = 'g',
-        .arg   = "0|1",
-        .flags = 0,
-        .doc   = "Value to set for the SEL0 bit.",
-        .group = 1
-    },
-    {
-        .name  = "en0",
         .key   = 'h',
         .arg   = "0|1",
         .flags = 0,
+        .doc   = "Value to set for the SEL0 bit.",
+        .group = 2
+    },
+    {
+        .name  = "en0",
+        .key   = 'i',
+        .arg   = "0|1",
+        .flags = 0,
         .doc   = "Value to set for the EN0 bit.",
-        .group = 1
+        .group = 2
     },
     {
         .name  = "p0",
@@ -52,7 +68,7 @@ const struct argp_option options[] = {
         .flags = 0,
         .doc   = "Value to set for the prescalar for OUT0. This is the "
                  "combination and mapping of the 0M0 and 0M1 bits.",
-        .group = 1
+        .group = 2
     },
     {
         .name  = "p1",
@@ -61,7 +77,7 @@ const struct argp_option options[] = {
         .flags = 0,
         .doc   = "Value to set for the prescalar for OUT2. This is the "
                  "combination and mapping of the 1M0 and 1M1 bits.",
-        .group = 1
+        .group = 2
     },
     {
         .name  = "div1",
@@ -69,7 +85,7 @@ const struct argp_option options[] = {
         .arg   = "0|1",
         .flags = 0,
         .doc   = "Value to set for the DIV1 bit.",
-        .group = 1
+        .group = 2
     },
     { 0 }
 };
@@ -101,6 +117,12 @@ parse_opts (int key, char *arg, struct argp_state *state)
     mux_args_t* mux_args = state->input;
 
     switch (key) {
+        case 'g':
+            mux_args->get = true;
+            break;
+        case 's':
+            mux_args->set = true;
+            break;
         case 'e':
             /* value for PDN1 bit, binary digit */
             mux_args->pdn1 = strtol (arg, NULL, 10);
@@ -115,14 +137,14 @@ parse_opts (int key, char *arg, struct argp_state *state)
                 argp_usage (state);
             mux_args->pdn0_set = true;
             break;
-        case 'g':
+        case 'h':
             /* value for SEL0 bit, binary digit */
             mux_args->sel0 = strtol (arg, NULL, 10);
             if (mux_args->sel0 < 0x0 | mux_args->sel0 > 0x1)
                 argp_usage (state);
             mux_args->sel0_set = true;
             break;
-        case 'h':
+        case 'i':
             /*value for EN0 bit, binary digit */
             mux_args->en0 = strtol (arg, NULL, 10);
             if (mux_args->en0 < 0x0 | mux_args->en0 > 0x1)
@@ -166,6 +188,8 @@ static void
 mux_args_dump (mux_args_t *mux_args)
 {
     printf ("Use provided options:\n");
+    printf ("  get:     %s\n",   mux_args->get ? "true" : "false");
+    printf ("  set:     $s\n",   mux_args->set ? "true" : "false");
     printf ("  address: 0x%x\n", mux_args->common_args.address);
     printf ("  bus-dev: %s\n",   mux_args->common_args.bus_dev);
     printf ("  verbose: %s\n",   mux_args->common_args.verbose ? "true" : "false");
@@ -181,6 +205,8 @@ mux_args_dump (mux_args_t *mux_args)
 void
 mux_args_init (mux_args_t *mux_args)
 {
+    mux_args->get      = false;
+    mux_args->set      = false;
     mux_args->pdn1     = DS1077L_PDN1_DEFAULT;
     mux_args->pdn1_set = false;
     mux_args->pdn0     = DS1077L_PDN0_DEFAULT;
@@ -253,6 +279,14 @@ main (int argc, char *argv[])
         perror ("argp_parse: \n");
         exit (1);
     }
+    if (mux_args.get && mux_args.set) {
+        fprintf (stderr, "Select either 'get' or 'set', not both.\n");
+        exit (1);
+    }
+    if (! (mux_args.get || mux_args.set)) {
+        fprintf (stderr, "Must select either 'get' or 'set'.\n");
+        exit (1);
+    }
     if (mux_args.common_args.verbose)
         mux_args_dump (&mux_args);
     fd = handle_get (mux_args.common_args.bus_dev,
@@ -269,8 +303,10 @@ main (int argc, char *argv[])
         perror ("mux_set: ");
         exit (1);
     }
-    if (mux_args.common_args.verbose)
+    if (mux_args.get || mux_args.common_args.verbose)
         mux_pretty (&mux_current);
+    if (mux_args.get)
+        exit (0);
     /* determine whether any values are bing changed, exit if not */
     mux_new = mux_current;
     mux_from_args (&mux_args, &mux_new);
