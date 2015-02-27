@@ -10,7 +10,23 @@ static void bus_args_dump (bus_args_t *bus_args);
 static error_t parse_opts (int key, char *arg, struct argp_state *state);
 
 const struct argp_option options[] = {
-     {
+    {
+        .name  = "get",
+        .key   = 'g',
+        .arg   = 0,
+        .flags = OPTION_ARG_OPTIONAL,
+        .doc   = "Get the contents of the BUS register.",
+        .group = 1
+    },
+    {
+        .name  = "set",
+        .key   = 's',
+        .arg   = 0,
+        .flags = OPTION_ARG_OPTIONAL,
+        .doc   = "Set the contents of the BUS register.",
+        .group = 1
+    },
+    {
         .name  = "new-addr",
         .key   = 'n',
         .arg   = "0x5[8-f]",
@@ -18,7 +34,7 @@ const struct argp_option options[] = {
         .flags = 0,
         .doc   = "The new address to assign to the timer specified by the "
                  "\'address\' parameter",
-        .group = 1
+        .group = 2
     },
     {
         .name  = "wc",
@@ -28,7 +44,7 @@ const struct argp_option options[] = {
         .doc   = "When set to 0 all changes to registers will be written to "
                  "EEPROM. When set to 1, an explicit WRITE command is "
                  "required.",
-        .group = 1
+        .group = 2
     },
     { 0 }
 };
@@ -47,7 +63,7 @@ const struct argp argps = {
     options,
     parse_opts,
     NULL,
-    "Set values in the BUS register of a Maxim DS1077L programmable oscillator.",
+    "Interact with the BUS register of a Maxim DS1077L programmable oscillator.",
     argp_children
 };
 
@@ -58,6 +74,12 @@ parse_opts (int key, char *arg, struct argp_state *state)
 
     switch (key)
     {
+        case 'g':
+            bus_args->get = true;
+            break;
+        case 's':
+            bus_args->set = true;
+            break;
         case 'n':
             /* same as above */
             bus_args->new_addr = strtol (arg, NULL, 16);
@@ -73,6 +95,8 @@ parse_opts (int key, char *arg, struct argp_state *state)
             bus_args->wc_set = true;
             break;
         case ARGP_KEY_INIT:
+            bus_args->get = false;
+            bus_args->set = false;
             bus_args->new_addr = DS1077L_ADDR_DEFAULT,
             bus_args->new_addr_set = false,
             bus_args->wc = DS1077L_WC_DEFAULT,
@@ -108,6 +132,14 @@ main (int argc, char *argv[])
         perror ("argp_parse: \n");
         exit (1);
     }
+    if (bus_args.get && bus_args.set) {
+        fprintf (stderr, "Select either 'get' or 'set', not both.\n");
+        exit (1);
+    }
+    if (! (bus_args.get || bus_args.set)) {
+        fprintf (stderr, "Must select either 'get' or 'set'.\n");
+        exit (1);
+    }
     if (! (bus_args.new_addr_set | bus_args.wc_set)) {
         fprintf(stderr, "Either a new address or a new value for the wc bit must be provided.\n");
         exit (1);
@@ -125,10 +157,12 @@ main (int argc, char *argv[])
         perror ("bus_set: ");
         exit (1);
     }
-    if (bus_args.common_args.verbose) {
+    if (bus_args.common_args.verbose || bus_args.get) {
         printf ("Current BUS register state:\n");
         bus_pretty (&bus);
     }
+    if (bus_args.get)
+        exit (0);
     /* populate new structure, display to user, and make change */
     if (bus_args.new_addr_set)
         bus.address = bus_args.new_addr;

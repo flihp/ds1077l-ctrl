@@ -5,6 +5,8 @@
 
 typedef struct bus_args {
     ds1077l_common_args_t common_args;
+    bool get;
+    bool set;
     uint8_t new_addr;
     bool new_addr_set;
     bool wc;
