@@ -16,12 +16,28 @@ static error_t parse_opts (int key, char *arg, struct argp_state *state);
  */
 const struct argp_option options[] = {
     {
+        .name  = "get",
+        .key   = 'g',
+        .arg   = 0,
+        .flags = OPTION_ARG_OPTIONAL,
+        .doc   = "Get the contents of the DIV register.",
+        .group = 1
+    },
+    {
+        .name  = "set",
+        .key   = 's',
+        .arg   = 0,
+        .flags = OPTION_ARG_OPTIONAL,
+        .doc   = "Set the contents of the BUS register.",
+        .group = 1
+    },
+    {
         .name  = "divider",
         .key   = 'n',
         .arg   = "2-1025",
         .flags = 0,
         .doc   = "Value of the programmable divider on OUT1.",
-        .group = 1
+        .group = 2
     },
     { 0 }
 };
@@ -53,6 +69,12 @@ parse_opts (int key, char *arg, struct argp_state *state)
     div_args_t* div_args = state->input;
 
     switch (key) {
+        case 'g':
+            div_args->get = true;
+            break;
+        case 's':
+            div_args->set = true;
+            break;
         case 'n':
             /* n divider value, between 2 and 1025 decimal */
             div_args->divider = strtol (arg, NULL, 10);
@@ -61,6 +83,8 @@ parse_opts (int key, char *arg, struct argp_state *state)
             div_args->divider_set = true;
             break;
         case ARGP_KEY_INIT:
+            div_args->get = false;
+            div_args->set = false;
             div_args->divider = DS1077L_DIV_DEFAULT_UNPACKED;
             div_args->divider_set = false;
             state->child_inputs[0] = &(div_args->common_args);
@@ -93,8 +117,17 @@ main (int argc, char *argv[])
         perror ("argp_parse: \n");
         exit (1);
     }
-    if (!div_args.divider_set) {
-        argp_help (&argps, stderr, ARGP_HELP_USAGE, NULL);
+    if (div_args.get && div_args.set) {
+        fprintf (stderr, "Select either 'get' or 'set', not both.\n");
+        exit (1);
+    }
+    if (! (div_args.get || div_args.set)) {
+        fprintf (stderr, "Must select either 'get' or 'set'.\n");
+        exit (1);
+    }
+    if (div_args.set && !div_args.divider_set) {
+        fprintf (stderr, "Must specificy divider value when setting "
+                         " register.\n");
         exit (1);
     }
     if (div_args.common_args.verbose)
@@ -113,8 +146,10 @@ main (int argc, char *argv[])
         perror ("div_set: ");
         exit (1);
     }
-    if (div_args.common_args.verbose)
+    if (div_args.get || div_args.common_args.verbose)
         div_pretty (&div);
+    if (div_args.get)
+        exit (0);
     /* populate new structure, display to user, and make change */
     div.n = div_args.divider;
     if (div_args.common_args.verbose) {

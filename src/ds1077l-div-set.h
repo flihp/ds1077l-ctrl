@@ -5,6 +5,8 @@
 
 typedef struct div_args {
     ds1077l_common_args_t common_args;
+    bool get;
+    bool set;
     uint16_t divider;
     bool divider_set;
 } div_args_t;
