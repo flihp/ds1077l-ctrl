@@ -34,7 +34,3 @@ typedef struct ds1077l_bus {
     bool wc;
     uint8_t address;
 } ds1077l_bus_t;
-
-int bus_get(int fd, ds1077l_bus_t* bus);
-int bus_set (int fd, ds1077l_bus_t *bus);
-void bus_pretty(ds1077l_bus_t* bus);
