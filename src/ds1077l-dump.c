@@ -1,6 +1,7 @@
 #include "ds1077l.h"
 #include "ds1077l-bus.h"
 #include "ds1077l-div.h"
+#include "ds1077l-mux.h"
 
 #include <argp.h>
 #include <stdio.h>
