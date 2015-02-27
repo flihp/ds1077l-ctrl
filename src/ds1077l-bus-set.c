@@ -35,10 +35,10 @@ const struct argp_option options[] = {
 
 const struct argp_child argp_children[] = {
     {
-        &common_argp,
-        0,
-        0,
-        0
+        .argp = &common_argp,
+        .flags = 0,
+        .header = 0,
+        .group = 0
     },
     { 0 }
 };
