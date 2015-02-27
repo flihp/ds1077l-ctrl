@@ -13,10 +13,6 @@
 /* stuff */
 #define I2C_BUS_DEVICE "/dev/i2c-1"
 
-/* properties */
-#define DS1077L_ADDR_DEFAULT 0x58
-#define DS1077L_WC_DEFAULT   false
-
 /* MUX WORD */
 #define DS1077L_PDN1_DEFAULT 0x0
 #define DS1077L_PDN0_DEFAULT 0x0
@@ -28,31 +24,7 @@
 
 /* commands */
 #define COMMAND_MUX 0x02
-#define COMMAND_BUS 0x0d
 #define COMMAND_E2_WRITE 0x3f
-
-/* bus register (un)?pack
- * Diagram taken from the spec sheet, page 7.
- *
- * BUS WORD
- * +-----------------+----+----+----+----+----+----+----+----+
- * | NAME            | -  | -  | -  | -  | WC | A2 | A1 | A0 |
- * +-----------------+----+----+----+----+----+----+----+----+
- * | Factory Default | 0* | 0* | 0* | 0* | 0  | 0  | 0  | 0  |
- * +-----------------+----+----+----+----+----+----+----+----+
- * * These bits are reserved and must be set to zero.
- *
- * NOTE: the WC bit is reversed from what we would normally expect. When it's
- *       set to 0 the DS1077L will write registers to EEPROM on any changes
- *       and when it's set to 1 changes are written to EEPROM only on a WRITE
- *       command. When we pack and unpack this bit we set the boolean in the
- *       ds1077l_bus_t structure to true if this bit is 0 and false if it's 1.
- */
-#define ADDRESS_UNPACK(bus) (0x07 & bus | DS1077L_ADDR_DEFAULT)
-#define WC_UNPACK(bus)      ((bus & 0x08) ? true : false)
-#define ADDRESS_PACK(address) (address & 0x07)
-#define WC_PACK(wc) (((wc ? 1 : 0) & 0x01) << 3)
-#define BUS_PACK(bus)       (ADDRESS_PACK(bus->address) | WC_PACK(bus->wc))
 
 /* mux register (un)?pack
  * Diagram taken from the spec sheet page 5.
@@ -92,11 +64,6 @@
 #define DIV1_UNPACK(mux) (mux & 0x4000 ? true : false)
 #define DIV1_PACK(div1)  (div1 ? 0x4000 : 0x0000)
 
-typedef struct ds1077l_bus {
-    bool wc;
-    uint8_t address;
-} ds1077l_bus_t;
-
 typedef struct ds1077l_mux {
     bool pdn1;
     bool pdn0;
@@ -118,9 +85,6 @@ extern const struct argp common_argp;
 extern const struct argp_option common_options[];
 
 int handle_get(char* dev, uint8_t addr);
-int bus_get(int fd, ds1077l_bus_t* bus);
-int bus_set (int fd, ds1077l_bus_t *bus);
-void bus_pretty(ds1077l_bus_t* bus);
 int mux_get(int fd, ds1077l_mux_t* mux);
 int mux_set(int fd, ds1077l_mux_t *mux);
 void mux_pretty(ds1077l_mux_t* mux);

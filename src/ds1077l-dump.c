@@ -1,4 +1,5 @@
 #include "ds1077l.h"
+#include "ds1077l-bus.h"
 #include "ds1077l-div.h"
 
 #include <argp.h>
