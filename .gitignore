@@ -1,5 +1,5 @@
 src/ds1077l-bus
-src/ds1077l-div-set
+src/ds1077l-div
 src/ds1077l-mux-set
 src/ds1077l-dump
 src/*.o
