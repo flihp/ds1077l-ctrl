@@ -2,5 +2,6 @@ src/ds1077l-bus
 src/ds1077l-div
 src/ds1077l-mux
 src/ds1077l-dump
+src/ds1077l-writee2
 src/*.o
 test/ds1077l-*_test

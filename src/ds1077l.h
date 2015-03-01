@@ -13,9 +13,6 @@
 /* stuff */
 #define I2C_BUS_DEVICE "/dev/i2c-1"
 
-/* commands */
-#define COMMAND_E2_WRITE 0x3f
-
 typedef struct ds1077l_common_args {
     uint16_t address;
     char *bus_dev;
@@ -28,5 +25,6 @@ extern const struct argp_option common_options[];
 
 int handle_get(char* dev, uint8_t addr);
 error_t parse_common_opts (int key, char *arg, struct argp_state *state);
+void dump_common_opts (ds1077l_common_args_t* common_args);
 
 #endif // #ifndef _DS1077L_H_

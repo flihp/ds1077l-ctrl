@@ -72,6 +72,17 @@ parse_common_opts (int key, char *arg, struct argp_state *state)
     return 0;
 }
 
+/* Display common arguments.
+ */
+void
+dump_common_opts (ds1077l_common_args_t* common_args)
+{
+    printf ("Common arguments:\n");
+    printf ("  address: 0x%x\n", common_args->address);
+    printf ("  bus-dev: %s\n", common_args->bus_dev);
+    printf ("  verbose: %s\n", common_args->verbose ? "true" : "false");
+}
+
 /* Convenience function to get a file descriptor for an i2c bus. Set the device
    address (second parameter) to 0 and the default address for the DS1077L will
    be used.
