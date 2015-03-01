@@ -19,3 +19,12 @@ register state the user must specify the --get option. To set the register
 state the user must specify the --set option along with a series of options
 specific to the register that define the register state.
 
+# Building
+These utilities are specific to Linux and depend on the Linux I2C userspace
+headers. On Debian these are available through the libi2c-dev package. Once
+these are installed the ds1077l-ctrl tools are built with the typical make
+commands:
+
+$ make
+$ sudo make install
+
