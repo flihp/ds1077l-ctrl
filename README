@@ -1,2 +1,19 @@
-Utilities for configuring the Maxim DS1077L oscillator.
+The Maxim DS1077L  oscillator is attached to the I2C bus as a slave. It has 3
+registers that we can set to define its behavior. For details on the structure
+of these registers and how they effect the behavior of the device consult the
+spec sheet.
+
+This is a collection of utilities for getting and setting the state of these
+registers. Each utility is specific to a register. To identify the DS1077L that
+we're operating on, each utility takes an optional --address and --bus-dev
+argument. I2C bus address are 10 bits long though the DS1077L only allows for
+the lower 3 bits to be changed and so the --address parameter must be in the
+range 0x58 - 0x5f. The --bus-dev option specifies the device node associated
+with the I2C bus the DS1077L is attached.
+
+Additionally each utility takes a --get or a --set parameter to specify whether
+the user wishes to display or set the state of a specific register. To get the
+register state the user must specify the --get option. To set the register
+state the user must specify the --set option along with a series of options
+specific to the register that define the register state.
 
