@@ -3,4 +3,4 @@ src/ds1077l-div
 src/ds1077l-mux
 src/ds1077l-dump
 src/*.o
-src/ds1077l-*_test
+test/ds1077l-*_test

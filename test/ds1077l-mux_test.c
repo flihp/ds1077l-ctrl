@@ -1,5 +1,5 @@
-#include "ds1077l.h"
-#include "ds1077l-mux.h"
+#include "../src/ds1077l.h"
+#include "../src/ds1077l-mux.h"
 
 #include <stdint.h>
 #include <stdio.h>

@@ -1,4 +1,4 @@
-#include "ds1077l-bus.h"
+#include "../src/ds1077l-bus.h"
 
 #include <stdint.h>
 #include <stdio.h>
