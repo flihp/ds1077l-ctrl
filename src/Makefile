@@ -29,6 +29,7 @@ clean :
 
 ${COMMON_OBJ} : ${COMMON_SRC}
 
+${BUS_OBJ} : ${BUS_SRC}
 ${BUS_BIN} : ${COMMON_OBJ} ${BUS_OBJ}
 
 ${DIV_OBJ} : ${DIV_SRC}
