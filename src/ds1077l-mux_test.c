@@ -1,3 +1,4 @@
+#include "ds1077l.h"
 #include "ds1077l-mux.h"
 
 #include <stdint.h>
