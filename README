@@ -8,16 +8,20 @@ spec sheet.
 This is a collection of utilities for getting and setting the state of these
 registers. Each utility is specific to a register. To identify the DS1077L that
 we're operating on, each utility takes an optional --address and --bus-dev
-argument. I2C bus address are 10 bits long though the DS1077L only allows for
-the lower 3 bits to be changed and so the --address parameter must be in the
-range 0x58 - 0x5f. The --bus-dev option specifies the device node associated
-with the I2C bus the DS1077L is attached.
+argument.
+
+The DS1077L uses a 7 bit I2C bus address. The top 4 bits are hard wired to
+'1011' and the lower 3 bits can be programmed to work around address conflicts.
+Given this, the --address parameter must be in the range 0x58 - 0x5f. The
+--bus-dev option specifies the device node associated with the I2C bus the DS1077L is attached. This is typically represented by a device node under /dev.
 
 Additionally each utility takes a --get or a --set parameter to specify whether
-the user wishes to display or set the state of a specific register. To get the
-register state the user must specify the --get option. To set the register
-state the user must specify the --set option along with a series of options
-specific to the register that define the register state.
+the user wishes to display or set the state of a register. To get the register
+state the user must specify the --get option. To set the register state the
+user must specify the --set option along with a series of options specific to
+the register that define the register state. For a description of the
+parameters taken by each utility consult the usage message through the --help
+option.
 
 # Building
 These utilities are specific to Linux and depend on the Linux I2C userspace
