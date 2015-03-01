@@ -83,3 +83,39 @@ typedef struct mux_args {
     bool div1_set;
 } mux_args_t;
 
+/* Map divisor values to prescalar.
+ */
+inline uint8_t
+encode_prescalar (uint8_t m)
+{
+    switch (m) {
+    case 1:
+        return 0;
+    case 2:
+        return 1;
+    case 4:
+        return 2;
+    case 8:
+        return 3;
+    default:
+        return -1;
+    }
+}
+
+/* Map prescalar values to divisor.
+ */
+inline uint8_t decode_prescalar(uint8_t m)
+{
+    switch (m) {
+    case 0:
+        return 1;
+    case 1:
+        return 2;
+    case 2:
+        return 4;
+    case 3:
+        return 8;
+    default:
+        return -1;
+    }
+}

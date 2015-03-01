@@ -29,7 +29,4 @@ extern const struct argp_option common_options[];
 int handle_get(char* dev, uint8_t addr);
 error_t parse_common_opts (int key, char *arg, struct argp_state *state);
 
-inline uint8_t encode_prescalar(uint8_t m);
-inline uint8_t decode_prescalar(uint8_t m);
-
 #endif // #ifndef _DS1077L_H_
