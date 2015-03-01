@@ -12,7 +12,7 @@ const struct argp_option common_options[] = {
         .name  = "address",
         .key   = 'a',
         .arg   = "0x5[8-f]",
-        .flags = OPTION_ARG_OPTIONAL,
+        .flags = 0,
         .doc   = "The current address of the timer, between 0x58 and 0x5f. "
                  "Defaults to 0x58.",
         .group = 0
@@ -21,7 +21,7 @@ const struct argp_option common_options[] = {
         .name  = "bus-dev",
         .key   = 'd',
         .arg   = I2C_BUS_DEVICE,
-        .flags = OPTION_ARG_OPTIONAL,
+        .flags = 0,
         .doc   = "Path to the i2c bus the oscillator is attached to.",
         .group = 0
     },
