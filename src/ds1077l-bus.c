@@ -119,10 +119,7 @@ bus_pretty (ds1077l_bus_t* bus)
     if (bus == NULL)
         return;
     printf("BUS:\n");
-    printf("  Address: %#x\n", bus->address);
-    printf("    A2: %#x\n", bus->address & 0x4);
-    printf("    A1: %#x\n", bus->address & 0x2);
-    printf("    A0: %#x\n", bus->address & 0x1);
+    printf("  Address: 0x%#x\n", bus->address);
     printf("  WC: %s\n", bus->wc ? "true" : "false");
 }
 
