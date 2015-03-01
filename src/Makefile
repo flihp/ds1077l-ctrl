@@ -1,22 +1,24 @@
 .PHONY : all clean
 
-PREFIX = ds1077l
+PRE = ds1077l
 
-COMMON_OBJ = ${PREFIX}.o
-COMMON_SRC = ${PREFIX}.h ${PREFIX}.c
+COMMON_OBJ = ${PRE}.o
+COMMON_SRC = ${PRE}.h ${PRE}.c
 
-BUS_BIN = ${PREFIX}-bus
-BUS_OBJ = ${PREFIX}-bus.o
-BUS_SRC = ${PREFIX}-bus.c ${PREFIX}-bus.h ${PREFIX}.h
+BUS_PRE = ${PRE}-bus
+BUS_BIN = ${BUS_PRE}
+BUS_OBJ = ${BUS_PRE}.o
+BUS_SRC = ${BUS_PRE}.c ${BUS_PRE}.h ${PRE}.h
 
-DIV_BIN = ${PREFIX}-div
-DIV_OBJ = ${PREFIX}-div.o
-DIV_SRC = ${PREFIX}-div.c ${PREFIX}-div.h
+DIV_PRE = ${PRE}-div
+DIV_BIN = ${DIV_PRE}
+DIV_OBJ = ${DIV_PRE}.o
+DIV_SRC = ${DIV_PRE}.c ${DIV_PRE}.h
 
-PREFIX_MUX = ${PREFIX}-mux
-MUX_BIN = ${PREFIX_MUX}
-MUX_OBJ = ${PREFIX_MUX}.o
-MUX_SRC = ${PREFIX_MUX}.c ${PREFIX_MUX}.h
+MUX_PRE = ${PRE}-mux
+MUX_BIN = ${MUX_PRE}
+MUX_OBJ = ${MUX_PRE}.o
+MUX_SRC = ${MUX_PRE}.c ${MUX_PRE}.h
 
 BINS = ${BUS_BIN} ${DIV_BIN} ${MUX_BIN}
 OBJS = ${COMMON_OBJ} ${BUS_OBJ} ${DIV_OBJ} ${MUX_OBJ}
