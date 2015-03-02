@@ -148,17 +148,17 @@ main (int argc, char *argv[])
         perror ("argp_parse: \n");
         exit (1);
     }
-    if (div_args.get && div_args.set) {
-        fprintf (stderr, "Select either 'get' or 'set', not both.\n");
+    if (! (!div_args.get != !div_args.set)) {
+        fprintf (stderr, "Select either 'get' or 'set'.\n");
         exit (1);
     }
-    if (! (div_args.get || div_args.set)) {
-        fprintf (stderr, "Must select either 'get' or 'set'.\n");
+    if (div_args.get && div_args.divider_set) {
+        fprintf (stderr, "--divider cannot be provided with --get.\n");
         exit (1);
     }
     if (div_args.set && !div_args.divider_set) {
         fprintf (stderr, "Must specificy divider value when setting "
-                         " register.\n");
+                         "register.\n");
         exit (1);
     }
     if (div_args.common_args.verbose)
