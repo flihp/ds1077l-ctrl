@@ -148,7 +148,7 @@ main (int argc, char *argv[])
         perror ("argp_parse: \n");
         exit (1);
     }
-    if (! (!div_args.get != !div_args.set)) {
+    if (!div_args.get == !div_args.set) {
         fprintf (stderr, "Select either 'get' or 'set'.\n");
         exit (1);
     }
