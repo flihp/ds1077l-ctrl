@@ -342,12 +342,8 @@ main (int argc, char *argv[])
         perror ("argp_parse: \n");
         exit (1);
     }
-    if (mux_args.get && mux_args.set) {
-        fprintf (stderr, "Select either 'get' or 'set', not both.\n");
-        exit (1);
-    }
-    if (! (mux_args.get || mux_args.set)) {
-        fprintf (stderr, "Must select either 'get' or 'set'.\n");
+    if (!mux_args.get == !mux_args.set) {
+        fprintf (stderr, "Specify either --get or --set.\n");
         exit (1);
     }
     if (mux_args.common_args.verbose)
@@ -378,7 +374,7 @@ main (int argc, char *argv[])
         mux_pretty (&mux_new);
     }
     if (mux_compare (&mux_current, &mux_new) == 0) {
-        printf ("MUX register already in requested state. No change necessary.\n");
+        printf ("No change requested in MUX register. Abort.\n");
         exit (0);
     }
     if (mux_args.common_args.verbose) {
