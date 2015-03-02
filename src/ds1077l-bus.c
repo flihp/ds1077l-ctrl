@@ -188,7 +188,7 @@ main (int argc, char *argv[])
         perror ("argp_parse: \n");
         exit (1);
     }
-    if (!(!bus_args.get != !bus_args.set)) {
+    if (!bus_args.get == !bus_args.set) {
         fprintf (stderr, "Select either 'get' or 'set'.\n");
         exit (1);
     }
