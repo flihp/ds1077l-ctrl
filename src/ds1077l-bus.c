@@ -119,7 +119,7 @@ bus_pretty (ds1077l_bus_t* bus)
     if (bus == NULL)
         return;
     printf("BUS:\n");
-    printf("  Address: 0x%#x\n", bus->address);
+    printf("  Address: %#x\n", bus->address);
     printf("  WC: %s\n", bus->wc ? "true" : "false");
 }
 
@@ -188,15 +188,15 @@ main (int argc, char *argv[])
         perror ("argp_parse: \n");
         exit (1);
     }
-    if (bus_args.get && bus_args.set) {
-        fprintf (stderr, "Select either 'get' or 'set', not both.\n");
+    if (!(!bus_args.get != !bus_args.set)) {
+        fprintf (stderr, "Select either 'get' or 'set'.\n");
         exit (1);
     }
-    if (! (bus_args.get || bus_args.set)) {
-        fprintf (stderr, "Must select either 'get' or 'set'.\n");
+    if (bus_args.get && (bus_args.new_addr_set || bus_args.wc_set)) {
+        fprintf (stderr, "--new-addr and --wc make no sense with --get.\n");
         exit (1);
     }
-    if (! (bus_args.new_addr_set | bus_args.wc_set)) {
+    if (bus_args.set && ! (bus_args.new_addr_set || bus_args.wc_set)) {
         fprintf(stderr, "Either a new address or a new value for the wc bit must be provided.\n");
         exit (1);
     }
