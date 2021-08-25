@@ -1,3 +1,5 @@
+NOTE: This project is no longer maintained.
+
 # Background
 The Maxim DS1077L oscillator is attached to the I2C bus as a slave. It has 3
 registers that we can set to define its behavior. For details on the structure
